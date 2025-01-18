@@ -1,4 +1,11 @@
 Group 2 Work Project
+Ashley Smith 
+Stacy Oliverson
+Kelly Clark 
+Jonathan Aloya
+Diego Andres Grandos
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
