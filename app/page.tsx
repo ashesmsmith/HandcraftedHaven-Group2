@@ -1,3 +1,7 @@
+// app/page.tsx
+// Purpose: Represents the application's home page, typically the landing page or entry point for users.
+
+
 import Image from "next/image";
 import { cormorant, montserrat } from "./ui/fonts"; 
 

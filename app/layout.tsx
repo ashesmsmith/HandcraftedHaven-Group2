@@ -1,3 +1,9 @@
+// app/layout.tsx
+// Purpose: Defines the root layout for the application, including the global header, footer, and metadata.
+// This layout wraps all pages within the app.
+
+
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
