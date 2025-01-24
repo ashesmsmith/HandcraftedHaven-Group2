@@ -1,18 +1,17 @@
 import bcrypt from 'bcrypt';
 import { db } from '@vercel/postgres';
-import { sellers, products, reviews } from '../lib/placeholder-data';
+import { sellers, products, customers, orders, reviews } from '../lib/placeholder-data';
 
 const client = await db.connect();
 
 async function seedSellers() {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
     await client.sql`
         CREATE TABLE IF NOT EXISTS sellers (
-        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        firstName VARCHAR(255) NOT NULL,
-        lastName VARCHAR(255) NOT NULL,
+        seller_id PRIMARY KEY NOT NULL AUTO_INCREMENT,
+        firstName VARCHAR(50) NOT NULL,
+        lastName VARCHAR(50) NOT NULL,
         businessName VARCHAR(255) NOT NULL,
-        email TEXT NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL UNIQUE,
         password TEXT NOT NULL
         );
     `;
@@ -22,7 +21,7 @@ async function seedSellers() {
         const hashedPassword = await bcrypt.hash(seller.password, 10);
         return client.sql`
             INSERT INTO sellers (id, firstName, lastName, businessName, email, password)
-            VALUES (${seller.id}, ${seller.firstName}, ${seller.lastName}, ${seller.businessName}, ${seller.email}, ${hashedPassword})
+            VALUES (${seller.seller_id}, ${seller.firstName}, ${seller.lastName}, ${seller.businessName}, ${seller.email}, ${hashedPassword})
             ON CONFLICT (id) DO NOTHING;
         `;
         }),
@@ -32,8 +31,6 @@ async function seedSellers() {
 }
 
 async function seedProducts() {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
     await client.sql`
         CREATE TABLE IF NOT EXISTS products (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -58,8 +55,6 @@ async function seedProducts() {
 }
 
 async function seedReviews() {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
     await client.sql`
         CREATE TABLE IF NOT EXISTS reviews (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
