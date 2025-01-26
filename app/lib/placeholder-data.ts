@@ -1,96 +1,145 @@
 // This file contains placeholder data for Handcrafted Haven - Group 2
 
-const sellers = [
+const accounts = [
     {
-        seller_id: '1001',
+        account_id: '1001',
+        account_type: 'Admin',
         firstName: 'Admin',
         lastName: 'Account',
         businessName: 'Admin Account',
+        address: '123 Admin Street, Some City, UT, 54321',
+        phone: '111-111-1111',
         email: 'admin@email.com',
-        password: 'Abc12345'
+        password: 'Abc12345',
     },
     {
-        seller_id: '1002',
+        account_id: '1002',
+        account_type: 'Seller',
         firstName: 'Seller',
         lastName: 'Account',
-        businessName: 'First Seller Account',
+        businessName: 'My Small Business',
+        address: '456 Seller Street, Somewhere, UT, 12345',
+        phone: '222-222-2222',
         email: 'seller@email.com',
-        password: 'Abc12345'
+        password: 'Abc12345',
+    },
+    {
+        account_id: '1003',
+        account_type: 'Customer',
+        firstName: 'Mock',
+        lastName: 'Customer',
+        businessName: '',
+        address: '123 Main Street, Some City, ID, 67891',
+        phone: '333-333-3333',
+        email: 'mockcustomer@email.com',
+        password: 'Abc12345',
+    },
+    {
+        account_id: '1004',
+        account_type: 'Customer',
+        firstName: 'Another',
+        lastName: 'Customer',
+        businessName: '',
+        address: '456 Main Street, Somewhere, ID, 19876',
+        phone: '444-444-4444',
+        email: 'anothercust@email.com',
+        password: 'Abc12345',
     },
 ];
 
 const products = [
     {
         product_id: '1001',
-        seller_id: '1001',
-        productName: 'Product One',
-        productDesc: 'The first product',
-        price: '100.00',
+        account_id: '1002',
+        productName: 'Ceramic Flower Vase',
+        productDesc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        category: 'Pottery',
+        color: 'Orange',
+        price: '30.00',
         imageSRC: '/public/no-image.jpg',
     },
     {
         product_id: '1002',
-        seller_id: '1002',
-        productName: 'Product Two',
-        productDesc: 'The second product',
-        price: '200.00',
+        account_id: '1002',
+        productName: 'Book Nerd T-Shirt',
+        productDesc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        category: 'Clothing',
+        color: 'White',
+        price: '20.00',
+        imageSRC: '/public/no-image.jpg',
+    },
+    {
+        product_id: '1003',
+        account_id: '1002',
+        productName: 'Amethyst Necklace',
+        productDesc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        category: 'Jewelry',
+        color: 'Purple',
+        price: '250.00',
+        imageSRC: '/public/no-image.jpg',
+    },
+    {
+        product_id: '1004',
+        account_id: '1002',
+        productName: 'Dragon Sticket',
+        productDesc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        category: 'Stickers',
+        color: 'Red',
+        price: '5.00',
+        imageSRC: '/public/no-image.jpg',
+    },
+    {
+        product_id: '1005',
+        account_id: '1002',
+        productName: 'Wood Memory Box',
+        productDesc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        category: 'Woodworking',
+        color: 'Brown',
+        price: '75.00',
         imageSRC: '/public/no-image.jpg',
     },
 
-];
-
-const customers = [
-    {
-        customer_id: '1001',
-        firstName: 'Mock',
-        lastName: 'Customer',
-        address: '123 Main Street, Some City, ID, 12345',
-        phone: '555-555-5555',
-        email: 'mockcustomer@email.com',
-        password: 'Abc12345'
-    },
-    {
-        customer_id: '1002',
-        firstName: 'Another',
-        lastName: 'Customer',
-        address: '456 Main Street, Somewhere, UT, 54321',
-        phone: '444-444-4444',
-        email: 'anothercust@email.com',
-        password: 'Abc12345'
-    },
 ];
 
 const orders = [
     {
         order_id: '1001',
-        customer_id: '1002',
+        account_id: '1003',
         date: '2025-01-23',
         products: [
             {
                 product_id: '1001',
-                quantity: '2'
+                price: '30.00',
+                quantity: '2',
+                total: '60.00',
             },
-            {
-                product_id: '1002',
-                quantity: '4'
-            }
         ] ,
+        shipping: '10.00',
+        tax: '3.75',
+        final_total: '73.75',
         status: 'shipped',
     },
     {
         order_id: '1002',
-        customer_id: '1001',
-        date: '2025-01-23',
+        account_id: '1004',
+        date: '2025-01-24',
         products: [
             {
-                product_id: '1001',
-                quantity: '1'
+                product_id: '1002',
+                price: '20.00',
+                quantity: '4',
+                total: '80.00',
             },
             {
-                product_id: '1002',
-                quantity: '1'
-            }
+                product_id: '1004',
+                price: '5.00',
+                quantity: '4',
+                total: '20.00',
+            },
         ] ,
+        shipping: '8.00',
+        tax: '5.25',
+        final_total: '113.25',
         status: 'processed',
     },
 ];
@@ -99,7 +148,7 @@ const reviews = [
     {
         review_id: '1001',
         product_id: '1001',
-        customer_id: '1002',
+        account_id: '1003',
         stars: '5' ,
         review: 'Excellent!',
         date: '2025-01-23',
@@ -107,11 +156,11 @@ const reviews = [
     {
         review_id: '1002',
         product_id: '1002',
-        customer_id: '1001',
-        stars: '1' ,
-        review: 'Awful.',
+        account_id: '1004',
+        stars: '4',
+        review: 'Wonderful!',
         date: '2025-1-23',
     },
 ];
 
-export { sellers, products, customers, orders, reviews };
+export { accounts, products, orders, reviews };
