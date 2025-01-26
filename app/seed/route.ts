@@ -86,24 +86,28 @@ async function seedOrders() {
         order_id PRIMARY KEY NOT NULL AUTO_INCREMENT,
         account_id INT NOT NULL,
         date DATE NOT NULL,
-        products INT ARRAY NOT NULL,
+        product_id INT NOT NULL,
+        quantity INT NOT NULL,
+        total DECIMAL(65,4) NOT NULL,
         shipping DECIMAL(65,2),
         tax DECIMAL(65,2),
-        final_total DECIMAL(65,2),
-        status ENUM('processed', 'shipped', 'canceled'),
-        FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+        final_total DECIMAL(65,2) NOT NULL,
+        status ENUM('processed', 'shipped', 'canceled') NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES accounts(account_id),
+        FOREIGN KEY (product_id) REFERENCES products(product_id),
         );
     `;
 
     const insertedOrders = await Promise.all(
         orders.map(
         (order) => client.sql`
-            INSERT INTO customers (order_id, account_id, date, products, shipping, tax, final_total, status)
+            INSERT INTO customers (order_id, account_id, date, product_id, quantity, shipping, tax, final_total, status)
             VALUES (
                 ${order.order_id}, 
                 ${order.account_id}, 
                 ${order.date}, 
-                ${order.products},
+                ${order.product_id},
+                ${order.quantity},
                 ${order.shipping},
                 ${order.tax},
                 ${order.final_total},
