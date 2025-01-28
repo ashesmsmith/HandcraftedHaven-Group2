@@ -11,15 +11,15 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        "dark-green": "535E1C",
-        "light-green": "9BB07E",
-        "dark-brown": "543A27",
-        "light-brown": "8A5D3D",
-        "cream": "F1ECE2",
+        "dark-green": "#535E1C",
+        "light-green": "#BBC191",
+        "dark-brown": "#543A27",
+        "light-brown": "#8A5D3D",
+        "cream": "#F1ECE2",
       },
       fontFamily: {
-        sans: 'Montserrat',
-        serif: 'Cormorant',
+        sans: ["Montserrat", "sans-serif"],
+        serif: ["Cormorant", "serif"],
       }
     },
   },
