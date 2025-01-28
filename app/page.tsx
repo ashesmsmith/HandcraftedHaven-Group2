@@ -1,109 +1,51 @@
 // app/page.tsx
-// Purpose: Represents the application's home page, typically the landing page or entry point for users.
-
-
+import { Metadata } from "next";
 import Image from "next/image";
-import { cormorant, montserrat } from "./ui/fonts"; 
 
-export default function Home() {
+/**
+ * Next.js 13+ recommended approach for <head>:
+ * define metadata for your page here.
+ */
+export const metadata: Metadata = {
+  title: "Handcrafted Haven - Homepage",
+  description: "Welcome to Handcrafted Haven",
+};
+
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <h1 className={cormorant.className}>This is Cormorant</h1>
-        <p className={montserrat.className}>This is Montserrat</p>
+    <section className="container mx-auto flex flex-col items-center justify-center text-center py-20 px-6">
+      {/* Hero Section */}
+      <h1 className="text-4xl md:text-5xl font-bold mb-2 font-serif">
+        Handcrafted Haven
+      </h1>
+      <p className="text-lg text-dark-brown/70 mb-6">
+        Custom Creations
+      </p>
+      <div className="flex space-x-4">
+        <button className="border border-dark-brown text-dark-brown px-6 py-2 rounded hover:bg-dark-brown hover:text-cream transition-colors">
+          Button
+        </button>
+        <button className="bg-dark-brown text-cream px-6 py-2 rounded hover:bg-light-brown hover:text-white transition-colors">
+          Button
+        </button>
+      </div>
 
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Image Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-10">
+        {/* First placeholder with small logo */}
+        <div className="bg-light-brown h-48 flex items-center justify-center">
+          <Image
+            src="/sm-logo.webp"
+            alt="Handcrafted Haven Small Logo"
+            width={80}
+            height={80}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        {/* Second placeholder, just text */}
+        <div className="bg-dark-green h-48 flex items-center justify-center">
+          <span className="text-white">Image Placeholder</span>
+        </div>
+      </div>
+    </section>
   );
 }
