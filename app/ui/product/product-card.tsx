@@ -1,29 +1,32 @@
-/**
- * Product Card Component
- * 
- * Purpose:
- * - Displays a brief overview of a product in a grid or list view.
- * - Acts as an entry point for users to navigate to the product detail page.
- * 
- * Usage:
- * - Used in product listing pages like shop categories, search results, or related products.
- * 
- * Common Features:
- * - Product Image: Displays the primary image of the product.
- * - Product Name: Shows the name of the product (linked to the product detail page).
- * - Price: Displays the product price, including discounts if applicable.
- * - Add to Cart Button: Allows users to quickly add the product to their shopping cart.
- * - Optional Tags: Includes labels like "New", "On Sale", or "Out of Stock".
- * 
- * Props:
- * - `id`: Unique identifier for the product (used for navigation or actions).
- * - `name`: Product name.
- * - `image`: URL or object representing the product image.
- * - `price`: Product price or price range.
- * - `onAddToCart`: Callback for handling the "Add to Cart" action.
- * - `onQuickView`: Optional callback for opening a quick view modal.
- * 
- * Notes:
- * - Ensure proper accessibility attributes for image alt text and button labels.
- * - Supports customization via className or style props for consistent theming.
- */
+// app/ui/product/product-card.tsx
+
+import Image from "next/image";
+
+export default function ProductCard({
+  product,
+}: {
+  product: {
+    product_id: string;
+    productName: string;
+    productDesc: string;
+    price: number;
+    imageSRC: string;
+  };
+}) {
+  return (
+    <div className="border rounded-md p-4 shadow-md">
+      {/* Image container */}
+      <div className="relative w-full h-48 mb-4">
+        <Image
+          src={product.imageSRC}
+          alt={product.productName}
+          fill
+          className="object-cover rounded-md"
+        />
+      </div>
+      <h2 className="text-lg font-bold">{product.productName}</h2>
+      <p className="text-sm text-gray-600">{product.productDesc}</p>
+      <p className="text-md font-semibold">${product.price.toFixed(2)}</p>
+    </div>
+  );
+}
