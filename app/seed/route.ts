@@ -14,6 +14,7 @@ async function seedAccounts() {
             firstName VARCHAR(100) NOT NULL,
             lastName VARCHAR(100) NOT NULL,
             businessName VARCHAR(255),
+            tax_id INT UNIQUE,
             address TEXT NOT NULL,
             phone VARCHAR(15) NOT NULL,
             email TEXT NOT NULL UNIQUE,
@@ -33,12 +34,13 @@ async function seedAccounts() {
                 ${account.firstName}, 
                 ${account.lastName}, 
                 ${account.businessName}, 
+                ${account.tax_id},
                 ${account.address},
                 ${account.phone},
                 ${account.email}, 
                 ${hashedPassword}
             )
-            ON CONFLICT (account_id) DO NOTHING;
+            ON CONFLICT (account_id, email, tax_id) DO NOTHING;
         `;
         }),
     );
