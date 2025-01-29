@@ -144,12 +144,12 @@ async function seedOrders() {
                 INSERT INTO order_products (order_id, product_id, quantity, price, total)
                 VALUES ( 
                     ${order.order_id}, 
-                    ${product.product_id}
+                    ${product.product_id},
                     ${product.quantity}, 
                     ${product.price},
                     ${product.total}
                 )
-                ON CONFLICT (order_id) DO NOTHING;
+                ON CONFLICT (order_id, product_id) DO NOTHING;
             `,
         ),
     )};
