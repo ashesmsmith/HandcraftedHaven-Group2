@@ -52,7 +52,7 @@ async function seedProducts() {
     await client.sql`CREATE TYPE category_type AS ENUM ('Pottery', 'Clothing', 
         'Jewelry', 'Stickers', 'Woodworking', 'Other');`
     await client.sql`CREATE TYPE color_type AS ENUM ('Black', 'White', 'Gray', 
-        'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink');`
+        'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi');`
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS products (
