@@ -38,7 +38,7 @@ async function seedAccounts() {
                 ${account.email}, 
                 ${hashedPassword}
             )
-            ON CONFLICT (account_id) DO NOTHING;
+            ON CONFLICT (account_id, email) DO NOTHING;
         `;
         }),
     );
