@@ -100,7 +100,7 @@ async function seedOrders() {
         CREATE TABLE IF NOT EXISTS orders (
             order_id SERIAL PRIMARY KEY,
             account_id INT NOT NULL,
-            date DATE NOT NULL,
+            date DATE DEFAULT CURRENT_DATE,
             shipping DECIMAL(20,2),
             tax DECIMAL(20,2),
             final_total DECIMAL(20,2) NOT NULL,
@@ -111,12 +111,12 @@ async function seedOrders() {
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS order_products (
-            order_prod_id SERIAL PRIMARY KEY,
             order_id INT NOT NULL,
             product_id INT NOT NULL,
             quantity INT NOT NULL,
             price DECIMAL(20,2),
             total DECIMAL(20,2),
+            PRIMARY KEY (order_id, product_id),
             FOREIGN KEY (order_id) REFERENCES orders(order_id),
             FOREIGN KEY (product_id) REFERENCES products(product_id)
         );
@@ -130,7 +130,7 @@ async function seedOrders() {
                 VALUES (
                     ${order.order_id}, 
                     ${order.account_id}, 
-                    ${order.date}, 
+                    DATE ${order.date}, 
                     ${order.shipping},
                     ${order.tax},
                     ${order.final_total},
