@@ -60,7 +60,7 @@ const products = [
         category: 'Pottery',
         color: 'White',
         price: '30.00',
-        imageSRC: '/public/no-image.jpg',
+        imageSRC: '/public/prod_images/vase.webp',
     },
     {
         product_id: '1002',
@@ -70,7 +70,7 @@ const products = [
         category: 'Clothing',
         color: 'Green',
         price: '20.00',
-        imageSRC: '/public/no-image.jpg',
+        imageSRC: '/public/prod_images/book_shirt.webp',
     },
     {
         product_id: '1003',
@@ -80,7 +80,7 @@ const products = [
         category: 'Jewelry',
         color: 'Purple',
         price: '250.00',
-        imageSRC: '/public/no-image.jpg',
+        imageSRC: '/public/prod_images/necklace.webp',
     },
     {
         product_id: '1004',
@@ -90,7 +90,7 @@ const products = [
         category: 'Stickers',
         color: 'Multi',
         price: '5.00',
-        imageSRC: '/public/no-image.jpg',
+        imageSRC: '/public/prod_images/dragon_sticker.webp',
     },
     {
         product_id: '1005',
@@ -100,7 +100,7 @@ const products = [
         category: 'Woodworking',
         color: 'Brown',
         price: '75.00',
-        imageSRC: '/public/no-image.jpg',
+        imageSRC: '/public/prod_images/memory_box.webp',
     },
 
 ];
