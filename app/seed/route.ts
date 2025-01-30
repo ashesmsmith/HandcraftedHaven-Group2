@@ -130,7 +130,7 @@ async function seedOrders() {
                 VALUES (
                     ${order.order_id}, 
                     ${order.account_id}, 
-                    DATE ${order.date}, 
+                    ${order.date}::DATE, 
                     ${order.shipping},
                     ${order.tax},
                     ${order.final_total},
@@ -184,7 +184,7 @@ async function seedReviews() {
                 ${review.account_id},
                 ${review.stars}, 
                 ${review.review}, 
-                ${review.date}
+                ${review.date}::DATE
             )
             ON CONFLICT (product_id, account_id) DO NOTHING;
         `,
@@ -208,6 +208,7 @@ export async function GET() {
         })
     } catch (error) {
         console.error('Error Seeding Database: ', error);
+        
         await client.sql`ROLLBACK`;
         return new Response(JSON.stringify({ error, status: 500 }));
     }
