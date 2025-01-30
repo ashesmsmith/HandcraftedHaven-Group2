@@ -5,7 +5,7 @@ import { accounts, products, orders, reviews } from '../lib/placeholder-data';
 const client = await db.connect();
 
 async function seedAccounts() {
-    await client.sql`CREATE TYPE acct_type AS ENUM ('Admin', 'Seller', 'Customer');`
+    await client.sql`CREATE TYPE IF NOT EXISTS acct_type AS ENUM ('Admin', 'Seller', 'Customer');`
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS accounts (
@@ -49,10 +49,12 @@ async function seedAccounts() {
 }
 
 async function seedProducts() {
-    await client.sql`CREATE TYPE category_type AS ENUM ('Pottery', 'Clothing', 
-        'Jewelry', 'Stickers', 'Woodworking', 'Other');`
-    await client.sql`CREATE TYPE color_type AS ENUM ('Black', 'White', 'Gray', 
-        'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi');`
+    await client.sql`CREATE TYPE IF NOT EXISTS category_type AS ENUM ('Pottery', 
+        'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other');`
+
+    await client.sql`CREATE TYPE IF NOT EXISTS color_type AS ENUM ('Black', 'White', 
+        'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 
+        'Multi');`
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS products (
@@ -92,7 +94,7 @@ async function seedProducts() {
 }
 
 async function seedOrders() {
-    await client.sql`CREATE TYPE status_type AS ENUM ('processed', 'shipped', 'canceled');`
+    await client.sql`CREATE TYPE IF NOT EXISTS status_type AS ENUM ('processed', 'shipped', 'canceled');`
     
     await client.sql`
         CREATE TABLE IF NOT EXISTS orders (
@@ -162,12 +164,12 @@ async function seedOrders() {
 async function seedReviews() {
     await client.sql`
         CREATE TABLE IF NOT EXISTS reviews (
-            review_id PRIMARY KEY (product_id, account_id),
             product_id INT NOT NULL,
             account_id INT NOT NULL,
             stars INT NOT NULL,
             review TEXT,
             date DATE NOT NULL,
+            PRIMARY KEY (product_id, account_id),
             FOREIGN KEY (product_id) REFERENCES products(product_id),
             FOREIGN KEY (account_id) REFERENCES accounts(account_id)
         );
@@ -176,16 +178,15 @@ async function seedReviews() {
     const insertedReviews = await Promise.all(
         reviews.map(
         (review) => client.sql`
-            INSERT INTO reviews (review_id, product_id, account_id, stars, review, date)
-            VALUES (
-                ${review.review_id}, 
+            INSERT INTO reviews (product_id, account_id, stars, review, date)
+            VALUES ( 
                 ${review.product_id},
                 ${review.account_id},
                 ${review.stars}, 
                 ${review.review}, 
                 ${review.date}
             )
-            ON CONFLICT (review_id) DO NOTHING;
+            ON CONFLICT (product_id, account_id) DO NOTHING;
         `,
         ),
     );
@@ -206,6 +207,7 @@ export async function GET() {
             {status: 200, headers: {'Content-Type': 'application/json'}
         })
     } catch (error) {
+        console.error('Error Seeding Database: ', error);
         await client.sql`ROLLBACK`;
         return new Response(JSON.stringify({ error, status: 500 }));
     }

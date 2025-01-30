@@ -173,7 +173,6 @@ const orders = [
 
 const reviews = [
     {
-        review_id: '1001',
         product_id: '1002',
         account_id: '1003',
         stars: '5' ,
@@ -181,7 +180,6 @@ const reviews = [
         date: '2025-01-23',
     },
     {
-        review_id: '1002',
         product_id: '1005',
         account_id: '1004',
         stars: '4',
