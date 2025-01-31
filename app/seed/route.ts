@@ -5,7 +5,7 @@ import { accounts, products, orders, reviews } from '../lib/placeholder-data';
 const client = await db.connect();
 
 async function seedAccounts() {
-    await client.sql`CREATE TYPE IF NOT EXISTS acct_type AS ENUM ('Admin', 'Seller', 'Customer');`
+    await client.sql`CREATE TYPE acct_type AS ENUM ('Admin', 'Seller', 'Customer');`
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS accounts (
@@ -49,10 +49,10 @@ async function seedAccounts() {
 }
 
 async function seedProducts() {
-    await client.sql`CREATE TYPE IF NOT EXISTS category_type AS ENUM ('Pottery', 
+    await client.sql`CREATE TYPE category_type AS ENUM ('Pottery', 
         'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other');`
 
-    await client.sql`CREATE TYPE IF NOT EXISTS color_type AS ENUM ('Black', 'White', 
+    await client.sql`CREATE TYPE color_type AS ENUM ('Black', 'White', 
         'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 
         'Multi');`
 
@@ -94,7 +94,7 @@ async function seedProducts() {
 }
 
 async function seedOrders() {
-    await client.sql`CREATE TYPE IF NOT EXISTS status_type AS ENUM ('processed', 'shipped', 'canceled');`
+    await client.sql`CREATE TYPE status_type AS ENUM ('processed', 'shipped', 'canceled');`
     
     await client.sql`
         CREATE TABLE IF NOT EXISTS orders (
