@@ -5,7 +5,14 @@ import { accounts, products, orders, reviews } from '../lib/placeholder-data';
 const client = await db.connect();
 
 async function seedAccounts() {
-    await client.sql`CREATE TYPE acct_type AS ENUM ('Admin', 'Seller', 'Customer');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'acct_type') THEN
+                CREATE TYPE acct_type AS ENUM ('Admin', 'Seller', 'Customer');
+            END IF;
+        END $$;
+    `;
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS accounts (
@@ -13,8 +20,8 @@ async function seedAccounts() {
             account_type acct_type NOT NULL DEFAULT('Customer'),
             firstName VARCHAR(100) NOT NULL,
             lastName VARCHAR(100) NOT NULL,
-            businessName VARCHAR(255),
-            tax_id INT,
+            businessName VARCHAR(255) NULL,
+            tax_id INT NULL,
             address TEXT NOT NULL,
             phone VARCHAR(15) NOT NULL,
             email TEXT NOT NULL UNIQUE,
@@ -27,7 +34,7 @@ async function seedAccounts() {
         const hashedPassword = await bcrypt.hash(account.password, 10);
         return client.sql`
             INSERT INTO accounts(account_id, account_type, firstName, lastName, 
-                businessName, address, phone, email, password)
+                businessName, tax_id, address, phone, email, password)
             VALUES (
                 ${account.account_id},
                 ${account.account_type},
@@ -49,12 +56,23 @@ async function seedAccounts() {
 }
 
 async function seedProducts() {
-    await client.sql`CREATE TYPE category_type AS ENUM ('Pottery', 
-        'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'category_type') THEN
+                CREATE TYPE category_type AS ENUM ('Pottery', 'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other');
+            END IF;
+        END $$;
+    `;
 
-    await client.sql`CREATE TYPE color_type AS ENUM ('Black', 'White', 
-        'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 
-        'Multi');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'color_type') THEN
+                CREATE TYPE color_type AS ENUM ('Black', 'White', 'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi');
+            END IF;
+        END $$;
+    `;
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS products (
@@ -94,7 +112,14 @@ async function seedProducts() {
 }
 
 async function seedOrders() {
-    await client.sql`CREATE TYPE status_type AS ENUM ('processed', 'shipped', 'canceled');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_type') THEN
+                CREATE TYPE status_type AS ENUM ('processed', 'shipped', 'canceled');
+            END IF;
+        END $$;
+    `;
     
     await client.sql`
         CREATE TABLE IF NOT EXISTS orders (
