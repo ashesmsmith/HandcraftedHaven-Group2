@@ -42,7 +42,7 @@ export default function RootLayout({
               <Link href="/vendor" className="hover:text-dark-green">
                 Vendor Login
               </Link>
-              <Link href="/customer">
+              <Link href="/dashboard/auth/login">
                 <button className="bg-dark-green text-white py-2 px-4 rounded hover:bg-light-green hover:text-dark-brown transition-colors">
                   Customer Login
                 </button>
