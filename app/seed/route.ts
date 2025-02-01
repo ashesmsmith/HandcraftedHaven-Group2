@@ -5,7 +5,14 @@ import { accounts, products, orders, reviews } from '../lib/placeholder-data';
 const client = await db.connect();
 
 async function seedAccounts() {
-    await client.sql`CREATE TYPE acct_type AS ENUM ('Admin', 'Seller', 'Customer');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'acct_type') THEN
+                CREATE TYPE acct_type AS ENUM ('Admin', 'Seller', 'Customer');
+            END IF;
+        END $$;
+    `;
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS accounts (
@@ -13,8 +20,8 @@ async function seedAccounts() {
             account_type acct_type NOT NULL DEFAULT('Customer'),
             firstName VARCHAR(100) NOT NULL,
             lastName VARCHAR(100) NOT NULL,
-            businessName VARCHAR(255),
-            tax_id INT UNIQUE,
+            businessName VARCHAR(255) NULL,
+            tax_id INT NULL,
             address TEXT NOT NULL,
             phone VARCHAR(15) NOT NULL,
             email TEXT NOT NULL UNIQUE,
@@ -27,7 +34,7 @@ async function seedAccounts() {
         const hashedPassword = await bcrypt.hash(account.password, 10);
         return client.sql`
             INSERT INTO accounts(account_id, account_type, firstName, lastName, 
-                businessName, address, phone, email, password)
+                businessName, tax_id, address, phone, email, password)
             VALUES (
                 ${account.account_id},
                 ${account.account_type},
@@ -40,7 +47,7 @@ async function seedAccounts() {
                 ${account.email}, 
                 ${hashedPassword}
             )
-            ON CONFLICT (account_id, email, tax_id) DO NOTHING;
+            ON CONFLICT (account_id, email) DO NOTHING;
         `;
         }),
     );
@@ -49,10 +56,23 @@ async function seedAccounts() {
 }
 
 async function seedProducts() {
-    await client.sql`CREATE TYPE category_type AS ENUM ('Pottery', 'Clothing', 
-        'Jewelry', 'Stickers', 'Woodworking', 'Other');`
-    await client.sql`CREATE TYPE color_type AS ENUM ('Black', 'White', 'Gray', 
-        'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'category_type') THEN
+                CREATE TYPE category_type AS ENUM ('Pottery', 'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other');
+            END IF;
+        END $$;
+    `;
+
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'color_type') THEN
+                CREATE TYPE color_type AS ENUM ('Black', 'White', 'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi');
+            END IF;
+        END $$;
+    `;
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS products (
@@ -92,13 +112,20 @@ async function seedProducts() {
 }
 
 async function seedOrders() {
-    await client.sql`CREATE TYPE status_type AS ENUM ('processed', 'shipped', 'canceled');`
+    await client.sql`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_type') THEN
+                CREATE TYPE status_type AS ENUM ('processed', 'shipped', 'canceled');
+            END IF;
+        END $$;
+    `;
     
     await client.sql`
         CREATE TABLE IF NOT EXISTS orders (
             order_id SERIAL PRIMARY KEY,
             account_id INT NOT NULL,
-            date DATE NOT NULL,
+            date DATE DEFAULT CURRENT_DATE,
             shipping DECIMAL(20,2),
             tax DECIMAL(20,2),
             final_total DECIMAL(20,2) NOT NULL,
@@ -109,12 +136,12 @@ async function seedOrders() {
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS order_products (
-            order_prod_id SERIAL PRIMARY KEY,
             order_id INT NOT NULL,
             product_id INT NOT NULL,
             quantity INT NOT NULL,
             price DECIMAL(20,2),
             total DECIMAL(20,2),
+            PRIMARY KEY (order_id, product_id),
             FOREIGN KEY (order_id) REFERENCES orders(order_id),
             FOREIGN KEY (product_id) REFERENCES products(product_id)
         );
@@ -128,7 +155,7 @@ async function seedOrders() {
                 VALUES (
                     ${order.order_id}, 
                     ${order.account_id}, 
-                    ${order.date}, 
+                    ${order.date}::DATE, 
                     ${order.shipping},
                     ${order.tax},
                     ${order.final_total},
@@ -162,12 +189,12 @@ async function seedOrders() {
 async function seedReviews() {
     await client.sql`
         CREATE TABLE IF NOT EXISTS reviews (
-            review_id PRIMARY KEY (product_id, account_id),
             product_id INT NOT NULL,
             account_id INT NOT NULL,
             stars INT NOT NULL,
             review TEXT,
             date DATE NOT NULL,
+            PRIMARY KEY (product_id, account_id),
             FOREIGN KEY (product_id) REFERENCES products(product_id),
             FOREIGN KEY (account_id) REFERENCES accounts(account_id)
         );
@@ -176,16 +203,15 @@ async function seedReviews() {
     const insertedReviews = await Promise.all(
         reviews.map(
         (review) => client.sql`
-            INSERT INTO reviews (review_id, product_id, account_id, stars, review, date)
-            VALUES (
-                ${review.review_id}, 
+            INSERT INTO reviews (product_id, account_id, stars, review, date)
+            VALUES ( 
                 ${review.product_id},
                 ${review.account_id},
                 ${review.stars}, 
                 ${review.review}, 
-                ${review.date}
+                ${review.date}::DATE
             )
-            ON CONFLICT (review_id) DO NOTHING;
+            ON CONFLICT (product_id, account_id) DO NOTHING;
         `,
         ),
     );
@@ -206,6 +232,8 @@ export async function GET() {
             {status: 200, headers: {'Content-Type': 'application/json'}
         })
     } catch (error) {
+        console.error('Error Seeding Database: ', error);
+        
         await client.sql`ROLLBACK`;
         return new Response(JSON.stringify({ error, status: 500 }));
     }
