@@ -1,16 +1,24 @@
 // app/products/[id]/page.tsx
 
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 import {
   fetchProductById,
   fetchReviewsByProductId,
   calculateAverageRating,
-} from '@/app/lib/products';
-import ProductImage from '@/app/ui/product/product-image';
-import ProductDetails from '@/app/ui/product/product-details';
-import { cormorant, montserrat } from '@/app/ui/fonts';
+} from "@/app/lib/products";
+import ProductImage from "@/app/ui/product/product-image";
+import ProductDetails from "@/app/ui/product/product-details";
+import { cormorant, montserrat } from "@/app/ui/fonts";
 
-export default async function ProductDetail({ params }: { params: { id: string } }) {
+/**
+ * Remove references to a custom 'PageProps' interface.
+ * Just inline the param typing for 'params' like this:
+ */
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const product = await fetchProductById(params.id);
 
   if (!product) {
@@ -25,7 +33,7 @@ export default async function ProductDetail({ params }: { params: { id: string }
     <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 px-4">
       {/* Left: Product Image */}
       <div className="w-full md:w-1/2 mt-4">
-        <ProductImage imageUrl={product.imageSRC || '/placeholder.jpg'} />
+        <ProductImage imageUrl={product.imageSRC || "/placeholder.jpg"} />
       </div>
 
       {/* Right: Product Details */}
@@ -41,8 +49,8 @@ export default async function ProductDetail({ params }: { params: { id: string }
         {/* Average Rating */}
         <div className="mt-4">
           <p className={`${montserrat.className} text-lg font-semibold`}>
-            Average Rating:{' '}
-            {averageRating > 0 ? averageRating.toFixed(1) : 'No ratings yet'}
+            Average Rating:{" "}
+            {averageRating > 0 ? averageRating.toFixed(1) : "No ratings yet"}
           </p>
         </div>
 
@@ -54,11 +62,10 @@ export default async function ProductDetail({ params }: { params: { id: string }
           {reviews.length > 0 ? (
             <ul className="space-y-4">
               {reviews.map((review) => (
-                <li
-                  key={review.review_id}
-                  className="border rounded-md p-4"
-                >
-                  <p className={`${montserrat.className} text-sm font-semibold`}>
+                <li key={review.review_id} className="border rounded-md p-4">
+                  <p
+                    className={`${montserrat.className} text-sm font-semibold`}
+                  >
                     Customer ID: {review.customer_id}
                   </p>
                   <p className={`${montserrat.className} text-sm`}>

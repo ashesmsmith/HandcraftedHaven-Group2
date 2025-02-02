@@ -1,2 +1,4 @@
-// dashboard/auth/signup/page.tsx
-// Purpose: Provides a signup form for new users to create an account.
+// app/dashboard/auth/signup/page.tsx
+export default function SignUpPage() {
+    return <div>Sign Up Page</div>;
+  }
