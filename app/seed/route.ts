@@ -8,8 +8,8 @@ async function checkIfTypeExists(typeName: string, typeDefinition: string): Prom
     await client.sql`
         DO $$
         BEGIN
-            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ${typeName} 
-            THEN EXECUTE 'CREATE TYPE ' || ${typeName} || ' AS ENUM (' || ${typeDefinition} || ')';
+            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ${typeName}) THEN
+                EXECUTE 'CREATE TYPE ' || ${typeName} || ' AS ENUM (' || ${typeDefinition} || ')';
             END IF;
         END $$
     `;
@@ -225,12 +225,14 @@ export async function GET() {
         await client.sql`COMMIT`;
 
         return new Response(JSON.stringify({ message: 'Database seeded successfully' }),
-            {status: 200, headers: {'Content-Type': 'application/json'}
-        })
+            {status: 200, headers: {'Content-Type': 'application/json'}})
     } catch (error) {
         console.error('Error Seeding Database: ', error);
         
         await client.sql`ROLLBACK`;
-        return new Response(JSON.stringify({ error, status: 500 }));
+        return new Response(JSON.stringify({ error, status: 500 }), {
+            status: 500,
+            headers: {'Content-Type': 'application/json'}
+        });
     }
 }
