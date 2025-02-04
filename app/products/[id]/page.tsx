@@ -10,24 +10,19 @@ import ProductImage from "@/app/ui/product/product-image";
 import ProductDetails from "@/app/ui/product/product-details";
 import { cormorant, montserrat } from "@/app/ui/fonts";
 
-/**
- * Remove references to a custom 'PageProps' interface.
- * Just inline the param typing for 'params' like this:
- */
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const product = await fetchProductById(params.id);
+type tParams = Promise<{ id: string }>;
+
+export default async function ProductDetailPage(props: { params: tParams }) {
+  const { id } = await props.params;
+  const product = await fetchProductById(id);
 
   if (!product) {
     notFound(); // Render 404 page if the product doesn't exist
   }
 
   // Fetch reviews and calculate the average rating
-  const reviews = await fetchReviewsByProductId(params.id);
-  const averageRating = await calculateAverageRating(params.id);
+  const reviews = await fetchReviewsByProductId(id);
+  const averageRating = await calculateAverageRating(id);
 
   return (
     <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 px-4">
