@@ -187,7 +187,7 @@ const reviews = [
         account_id: accounts[3].account_id,
         stars: 4,
         review: 'Wonderful! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        date: '2025-1-23',
+        date: '2025-01-23',
     },
 ];
 

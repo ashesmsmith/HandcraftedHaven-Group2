@@ -18,7 +18,7 @@ export default function CustomerLoginPage() {
                 type="email"
                 id="email"
                 className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green"
-                placeholder="Value"
+                placeholder="email@email.com"
               />
             </div>
   
@@ -31,7 +31,7 @@ export default function CustomerLoginPage() {
                 type="password"
                 id="password"
                 className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green"
-                placeholder="Value"
+                placeholder="Password"
               />
             </div>
   
