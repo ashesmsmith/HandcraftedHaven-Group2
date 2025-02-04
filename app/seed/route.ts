@@ -4,6 +4,8 @@ import { accounts, products, orders, reviews, order_products } from '../lib/plac
 
 const client = await db.connect();
 
+await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
 async function checkIfTypeExists(typeName: string, typeDefinition: string): Promise<void> {
     await client.sql`
         DO $$
@@ -18,12 +20,10 @@ async function checkIfTypeExists(typeName: string, typeDefinition: string): Prom
 async function seedAccounts() {
     await checkIfTypeExists('acct-type', "'Admin', 'Seller', 'Customer'");
 
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
     await client.sql`
         CREATE TABLE IF NOT EXISTS accounts (
             account_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-            account_type acct_type NOT NULL DEFAULT('Customer'),
+            account_type acct_type NOT NULL DEFAULT ('Customer'),
             firstName VARCHAR(100) NOT NULL,
             lastName VARCHAR(100) NOT NULL,
             businessName VARCHAR(255) NULL,
@@ -65,16 +65,14 @@ async function seedProducts() {
     await checkIfTypeExists('category_type', "'Pottery', 'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other'");
     await checkIfTypeExists('color_type', "'Black', 'White', 'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi'");
 
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
     await client.sql`
         CREATE TABLE IF NOT EXISTS products (
             product_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
             account_id UUID NOT NULL,
             productName VARCHAR(255) NOT NULL,
             productDesc TEXT NOT NULL,
-            category category_type NOT NULL DEFAULT('Other'),
-            color color_type NOT NULL DEFAULT('White'),
+            category category_type NOT NULL DEFAULT ('Other'),
+            color color_type NOT NULL DEFAULT ('White'),
             price DECIMAL(20,2) NOT NULL,
             imageSRC TEXT NOT NULL,
             FOREIGN KEY (account_id) REFERENCES accounts(account_id)
@@ -106,8 +104,6 @@ async function seedProducts() {
 
 async function seedOrders() {
     await checkIfTypeExists('status_type', "'Processed', 'Shipped', 'Canceled'");
-    
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
     await client.sql`
         CREATE TABLE IF NOT EXISTS orders (
@@ -117,7 +113,7 @@ async function seedOrders() {
             shipping DECIMAL(20,2),
             tax DECIMAL(20,2),
             final_total DECIMAL(20,2) NOT NULL,
-            status status_type NOT NULL DEFAULT('Processed'),
+            status status_type NOT NULL DEFAULT ('Processed'),
             FOREIGN KEY (account_id) REFERENCES accounts(account_id)
         );
     `;
@@ -145,8 +141,6 @@ async function seedOrders() {
 }
 
 async function seedOrder_Products() {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
     await client.sql`
         CREATE TABLE IF NOT EXISTS order_products (
             order_id UUID NOT NULL,
@@ -179,9 +173,7 @@ async function seedOrder_Products() {
     return insertedOrder_Products;
 }
 
-async function seedReviews() {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-    
+async function seedReviews() {    
     await client.sql`
         CREATE TABLE IF NOT EXISTS reviews (
             product_id UUID NOT NULL,
