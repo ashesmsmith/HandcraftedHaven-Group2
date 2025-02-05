@@ -18,7 +18,7 @@ async function checkIfTypeExists(typeName: string, typeDefinition: string): Prom
 }
 
 async function seedAccounts() {
-  await checkIfTypeExists('acct-type', "'Admin', 'Seller', 'Customer'");
+  await checkIfTypeExists('acct_type', "'Admin', 'Seller', 'Customer'");
 
   await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
