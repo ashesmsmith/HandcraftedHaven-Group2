@@ -44,10 +44,10 @@ export default function CustomerLoginPage() {
             </button>
           </form>
   
-          {/* Forgot Password Link */}
+          {/* Sign UpLink */}
           <div className="mt-4">
-            <a href="#" className="text-sm text-dark-brown/70 hover:underline">
-              Forgot password?
+            <a href="/dashboard/auth/signup" className="text-sm text-dark-brown/70 hover:underline">
+              Not a member? Register today.
             </a>
           </div>
         </div>
