@@ -4,25 +4,38 @@ import { accounts, products, orders, reviews, order_products } from '../lib/plac
 
 const client = await db.connect();
 
+await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+function sanitizeInput(input: string): string {
+  // Allow only alphanumeric characters, underscores, and commas (specific to ENUM)
+  const sanitized = input.replace(/[^a-zA-Z0-9_,\s']/g, "");
+  return sanitized;
+}
+
 async function checkIfTypeExists(typeName: string, typeDefinition: string): Promise<void> {
-  // Add a trailing semicolon after `END;`
-  await client.sql`
+  console.log('Check if TYPE exists: ', typeName, typeDefinition);
+
+  typeName = sanitizeInput(typeName);
+  typeDefinition = sanitizeInput(typeDefinition);
+
+  console.log('Sanitized: ', typeName, typeDefinition);
+
+  const sql: string=`
     DO $$
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ${typeName}) THEN
-            EXECUTE 'CREATE TYPE ' || ${typeName} || ' AS ENUM (' || ${typeDefinition} || ')';
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = '${typeName}') THEN
+            EXECUTE 'CREATE TYPE ' || quote_ident(${typeName}) || ' AS ENUM (' || ${typeDefinition} || ')';
         END IF;
     END;
     $$;
   `;
+
+  await client.query(sql);
 }
 
 async function seedAccounts() {
-  await checkIfTypeExists('acct-type', "'Admin', 'Seller', 'Customer'");
+  await checkIfTypeExists('acct_type', "'Admin', 'Seller', 'Customer'");
 
-  await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  // Use DEFAULT 'Customer' instead of DEFAULT('Customer')
   await client.sql`
     CREATE TABLE IF NOT EXISTS accounts (
       account_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -78,9 +91,6 @@ async function seedProducts() {
   await checkIfTypeExists('category_type', "'Pottery', 'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other'");
   await checkIfTypeExists('color_type', "'Black', 'White', 'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi'");
 
-  await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  // Use DEFAULT 'Other' and DEFAULT 'White'
   await client.sql`
     CREATE TABLE IF NOT EXISTS products (
       product_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -127,9 +137,6 @@ async function seedProducts() {
 async function seedOrders() {
   await checkIfTypeExists('status_type', "'Processed', 'Shipped', 'Canceled'");
 
-  await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  // Use DEFAULT 'Processed'
   await client.sql`
     CREATE TABLE IF NOT EXISTS orders (
       order_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -171,8 +178,6 @@ async function seedOrders() {
 }
 
 async function seedOrder_Products() {
-  await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
   await client.sql`
     CREATE TABLE IF NOT EXISTS order_products (
       order_id UUID NOT NULL,
@@ -210,8 +215,6 @@ async function seedOrder_Products() {
 }
 
 async function seedReviews() {
-  await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
   await client.sql`
     CREATE TABLE IF NOT EXISTS reviews (
       product_id UUID NOT NULL,
@@ -250,14 +253,12 @@ async function seedReviews() {
 
 export async function GET() {
   try {
-    // Start transaction
     await client.sql`BEGIN`;
     await seedAccounts();
     await seedProducts();
     await seedOrders();
     await seedOrder_Products();
     await seedReviews();
-    // Commit transaction
     await client.sql`COMMIT`;
 
     return new Response(
@@ -266,7 +267,6 @@ export async function GET() {
     );
   } catch (error) {
     console.error('Error Seeding Database: ', error);
-    // Roll back transaction
     await client.sql`ROLLBACK`;
 
     return new Response(JSON.stringify({ error, status: 500 }), {
