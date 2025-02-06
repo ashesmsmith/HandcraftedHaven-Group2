@@ -3,12 +3,13 @@
 import { notFound } from "next/navigation";
 import {
   fetchProductById,
-  fetchReviewsByProductId,
+  fetchReviewsByProductID,
   calculateAverageRating,
-} from "@/app/lib/products";
+} from "@/app/lib/placeholder-data";
 import ProductImage from "@/app/ui/product/product-image";
 import ProductDetails from "@/app/ui/product/product-details";
 import { cormorant, montserrat } from "@/app/ui/fonts";
+
 
 type tParams = Promise<{ id: string }>;
 
@@ -21,7 +22,7 @@ export default async function ProductDetailPage(props: { params: tParams }) {
   }
 
   // Fetch reviews and calculate the average rating
-  const reviews = await fetchReviewsByProductId(id);
+  const reviews = await fetchReviewsByProductID(id);
   const averageRating = await calculateAverageRating(id);
 
   return (
@@ -50,37 +51,33 @@ export default async function ProductDetailPage(props: { params: tParams }) {
         </div>
 
         {/* Customer Reviews */}
-        <div className="mt-6">
-          <h2 className={`${cormorant.className} text-xl font-bold mb-2`}>
-            Customer Reviews
-          </h2>
-          {reviews.length > 0 ? (
-            <ul className="space-y-4">
-              {reviews.map((review) => (
-                <li key={review.review_id} className="border rounded-md p-4">
-                  <p
-                    className={`${montserrat.className} text-sm font-semibold`}
-                  >
-                    Customer ID: {review.customer_id}
-                  </p>
-                  <p className={`${montserrat.className} text-sm`}>
-                    Rating: {review.stars} / 5
-                  </p>
-                  <p className={`${montserrat.className} text-sm text-gray-600`}>
-                    {review.review}
-                  </p>
-                  <p className={`${montserrat.className} text-xs text-gray-400`}>
-                    {review.date}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={`${montserrat.className} text-gray-600`}>
-              No reviews yet. Be the first to review this product!
-            </p>
-          )}
-        </div>
+        <div>
+        <h2 className="text-xl font-bold mb-2">Customer Reviews</h2>
+        {reviews && reviews.length > 0 ? (
+          <ul className="space-y-4">
+            {reviews.map((review) => (
+              <li key={`${review.product_id}-${review.account_id}`} className="border rounded-md p-4">
+                <p className={`${montserrat.className} text-sm font-semibold`}>
+                  Customer ID: {review.account_id}
+                </p>
+                <p className={`${montserrat.className} text-sm`}>
+                  Rating: {review.stars} / 5
+                </p>
+                <p className={`${montserrat.className} text-sm text-gray-600`}>
+                  {review.review}
+                </p>
+                <p className={`${montserrat.className} text-xs text-gray-400`}>
+                  {review.date}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-600">No reviews yet.</p>
+        )}
+      </div>
+
+
       </div>
     </div>
   );

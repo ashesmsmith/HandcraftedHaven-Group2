@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { products } from "@/app/lib/products";
+import { products } from "@/app/lib/placeholder-data";
 import CategoryFilter from "@/app/ui/filters/category-filter";
 import PriceFilter from "@/app/ui/filters/price-filter";
 import SellerFilter from "@/app/ui/filters/seller-filter";
@@ -23,8 +23,8 @@ export default function ProductCatalog() {
       selectedCategory === null || product.category === selectedCategory;
     const isInPriceRange =
       product.price >= priceRange.min && product.price <= priceRange.max;
-    const isFromSeller =
-      selectedSeller === null || product.seller_id === selectedSeller;
+      const isFromSeller =
+      selectedSeller === null || product.account_id === selectedSeller;    
     return isInCategory && isInPriceRange && isFromSeller;
   });
 
@@ -57,10 +57,10 @@ export default function ProductCatalog() {
 
         {/* Seller Filter */}
         <div className="mt-6">
-          <SellerFilter
-            sellers={[...new Set(products.map((p) => p.seller_id))]} // Extract unique seller IDs
-            onFilterChange={setSelectedSeller}
-          />
+        <SellerFilter
+          sellers={[...new Set(products.map((p) => p.account_id))]} // Use account_id instead
+          onFilterChange={setSelectedSeller}
+        />
         </div>
 
         {/* Price Filter */}

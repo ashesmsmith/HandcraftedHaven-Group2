@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -20,4 +19,12 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+
+  /* Ensure scrolling works */
+  min-height: 100vh; /* Ensures body is at least as tall as the viewport */
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+  overflow-y: auto;
+  overflow: visible;
+  height: 100dvh; /* Ensures vertical scrolling is allowed */
 }
+

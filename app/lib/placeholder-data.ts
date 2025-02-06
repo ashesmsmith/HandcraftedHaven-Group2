@@ -1,5 +1,6 @@
 // This file contains placeholder data for Handcrafted Haven - Group 2
 
+
 const accounts = [
     {
         account_id: '0754fa5d-1be7-4cd9-b876-143b59d4db81',
@@ -60,7 +61,7 @@ const products = [
         category: 'Pottery',
         color: 'White',
         price: 30.00,
-        imageSRC: '/public/prod_images/vase.webp',
+        imageSRC: '/prod_images/vase.webp',
     },
     {
         product_id: '67657788-d579-43d9-a92e-e8754b02f7e2',
@@ -70,7 +71,7 @@ const products = [
         category: 'Clothing',
         color: 'Green',
         price: 20.00,
-        imageSRC: '/public/prod_images/book_shirt.webp',
+        imageSRC: '/prod_images/book_shirt.webp',
     },
     {
         product_id: '6fe17217-d5ff-40f6-90ae-deb69d778eff',
@@ -80,7 +81,7 @@ const products = [
         category: 'Jewelry',
         color: 'Purple',
         price: 250.00,
-        imageSRC: '/public/prod_images/necklace.webp',
+        imageSRC: '/prod_images/necklace.webp',
     },
     {
         product_id: '7940b624-cf63-4a86-bd27-34e72a1cab32',
@@ -90,7 +91,7 @@ const products = [
         category: 'Stickers',
         color: 'Multi',
         price: 5.00,
-        imageSRC: '/public/prod_images/dragon_sticker.webp',
+        imageSRC: '/prod_images/dragon_sticker.webp',
     },
     {
         product_id: 'f005a76d-094e-4f88-a498-3b43da59c1b0',
@@ -100,7 +101,7 @@ const products = [
         category: 'Woodworking',
         color: 'Brown',
         price: 75.00,
-        imageSRC: '/public/prod_images/memory_box.webp',
+        imageSRC: '/prod_images/memory_box.webp',
     },
 
 ];
@@ -192,3 +193,103 @@ const reviews = [
 ];
 
 export { accounts, products, orders, order_products, reviews };
+
+
+// Data Types: Defining explicit data types (e.g., Product, Review, Account) ensures type safety, 
+// prevents errors, and improves code clarity. This helps maintain consistency in function 
+// parameters and return values, making it easier to debug and extend the application.
+
+//Data Types:
+
+export type Product = {
+    product_id: string;
+    account_id: string;
+    productName: string;
+    productDesc: string;
+    category: string;
+    price: number;
+    imageSRC: string;
+}
+
+export type Review = {
+    product_id: string;
+    account_id: string;
+    stars: number;
+    review: string;
+    date: string;
+};
+
+
+
+// The Account type represents all user accounts. 
+// Only 'Seller' accounts include 'businessName' and 'tax_id', 
+// while 'Admin' and 'Customer' accounts do not need these properties.
+
+export type Account = {
+    account_id: string;
+    account_type: 'Admin' | 'Seller' | 'Customer';
+    firstName: string;
+    lastName: string;
+    businessName?: string;
+    tax_id?: number;
+    address: string;
+    phone: string;
+    email: string;
+    password: string;
+};
+
+export type Seller = Account & {
+    account_type: 'Seller';
+    businessName: string; // Only sellers have business names
+};
+
+// =====================================================
+// Functions for Fetching and Processing Data
+// =====================================================
+
+
+//Fetch product by ID
+export async function fetchProductById(product_id: string): Promise<Product | undefined> {
+    return products.find((product) => product.product_id === product_id);
+}
+
+//Fetch review by ID
+export async function fetchReviewByID(product_id: string): Promise<Review | undefined> {
+    return reviews.find((review) => review.product_id === product_id);
+}
+
+//Fetch all reviews by product ID
+export async function fetchReviewsByProductID(product_id: string): Promise<Review[]> {
+    return reviews.filter((review) => review.product_id === product_id);
+}
+
+
+//Fetch all products
+export async function fetchAllProducts(): Promise<Product[]> {
+  return products;
+}
+
+//Fetch products by category
+export async function fetchProductsByCategory(category: string): Promise<Product[]> {
+  return products.filter((product) => product.category === category);
+}
+
+// Fetch products by seller
+export async function fetchProductsBySeller(seller: Seller): Promise<Product[]> {
+    return products.filter((product) => product.account_id === seller.account_id);
+}
+
+// Fetch products sorted by price
+export async function fetchProductsByPrice(order: 'asc' | 'desc' = 'asc'): Promise<Product[]> {
+    if (!products || products.length === 0) return []; // Return empty array if products are missing
+    return [...products].sort((a, b) => (order === 'asc' ? a.price - b.price : b.price - a.price));
+  }
+  
+// Calculate the average rating for a product
+export async function calculateAverageRating(product_id: string): Promise<number> {
+    const productReviews = reviews.filter((review) => review.product_id === product_id);
+    if (productReviews.length === 0) return 0; // Prevents division by zero
+    const totalStars = productReviews.reduce((sum, review) => sum + Number(review.stars), 0);
+    return totalStars / productReviews.length;
+  }
+  
