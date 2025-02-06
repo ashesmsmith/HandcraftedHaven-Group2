@@ -1,4 +1,5 @@
 // app/layout.tsx
+
 import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -20,8 +21,8 @@ export default function RootLayout({
         {/* --- HEADER (site-wide) --- */}
         <header className="border-b border-dark-brown/20 bg-light-green">
           <div className="container mx-auto flex items-center justify-between py-4 px-6">
-            {/* Logo (Big) */}
-            <div className="flex items-center space-x-2">
+            {/* Clickable Logo + Site Title */}
+            <Link href="/" className="flex items-center space-x-2">
               <Image
                 src="/logo.webp"
                 alt="Handcrafted Haven Logo"
@@ -30,7 +31,7 @@ export default function RootLayout({
                 priority
               />
               <div className="font-bold text-xl font-serif">Handcrafted Haven</div>
-            </div>
+            </Link>
 
             {/* Nav Links */}
             <nav className="hidden md:flex items-center space-x-6">
@@ -39,12 +40,9 @@ export default function RootLayout({
 
             {/* Auth Buttons */}
             <div className="flex items-center space-x-4">
-              <Link href="/vendor" className="hover:text-dark-green">
-                Vendor Login
-              </Link>
               <Link href="/dashboard/auth/login">
                 <button className="bg-dark-green text-white py-2 px-4 rounded hover:bg-light-green hover:text-dark-brown transition-colors">
-                  Customer Login
+                  Login
                 </button>
               </Link>
             </div>
@@ -67,10 +65,7 @@ export default function RootLayout({
                   height={30}
                 />
                 <div className="font-bold text-xl font-serif">Handcrafted Haven</div>
-                {/* Existing placeholders for social icons - you can replace with actual icons */}
-                <div className="flex space-x-2">
-                  By Group 2
-                </div>
+                <div className="flex space-x-2">By Group 2</div>
               </div>
             </div>
 
@@ -79,9 +74,8 @@ export default function RootLayout({
               {/* Add more footer link columns here if desired */}
             </div>
 
-            {/* Bottom Row: Social Media + Copyright */}
+            {/* Bottom Row */}
             <div className="mt-8 flex flex-col md:flex-row items-center justify-between">
-              {/* Example row for Facebook, Instagram, LinkedIn */}
               <div className="flex space-x-4 text-sm">
                 <Link href="#" className="hover:text-dark-green">
                   Facebook
