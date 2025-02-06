@@ -25,7 +25,7 @@ export default function CategoryFilter({
           <button
             key={category} 
             onClick={() => handleCategoryChange(category)}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded border-2 border-[#543A27] ${
               selectedCategory === category
                 ? 'bg-[#543A27] text-white'
                 : 'bg-[#F1ECE2] text-[#543A27]'

@@ -27,18 +27,18 @@ export default function PriceFilter({
           placeholder="Min"
           value={minPrice}
           onChange={(e) => setMinPrice(Number(e.target.value))}
-          className="border rounded p-2 w-20"
+          className="border rounded p-2 w-16"
         />
         <input
           type="number"
           placeholder="Max"
           value={maxPrice}
           onChange={(e) => setMaxPrice(Number(e.target.value))}
-          className="border rounded p-2 w-20"
+          className="border rounded p-2 w-16"
         />
         <button
           onClick={handlePriceChange}
-          className="px-3 py-1 bg-[#543A27] text-white font-semibold rounded hover:bg-[#8A5D3D] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
+          className="px-1 py-1 bg-[#543A27] text-white font-semibold rounded hover:bg-[#8A5D3D] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
         >
           Apply
         </button>

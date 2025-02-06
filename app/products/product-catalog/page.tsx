@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { products } from "@/app/lib/placeholder-data";
+import { accounts } from "@/app/lib/placeholder-data"; // Import accounts
+
 import CategoryFilter from "@/app/ui/filters/category-filter";
 import PriceFilter from "@/app/ui/filters/price-filter";
 import SellerFilter from "@/app/ui/filters/seller-filter";
@@ -23,8 +25,8 @@ export default function ProductCatalog() {
       selectedCategory === null || product.category === selectedCategory;
     const isInPriceRange =
       product.price >= priceRange.min && product.price <= priceRange.max;
-      const isFromSeller =
-      selectedSeller === null || product.account_id === selectedSeller;    
+    const isFromSeller =
+      selectedSeller === null || product.account_id === selectedSeller;
     return isInCategory && isInPriceRange && isFromSeller;
   });
 
@@ -51,16 +53,31 @@ export default function ProductCatalog() {
 
         {/* Category Filter */}
         <CategoryFilter
-          categories={[...new Set(products.map((p) => p.category))]} // Extract unique categories
+          categories={[...new Set(products.map((p) => p.category))]}
           onFilterChange={setSelectedCategory}
         />
 
         {/* Seller Filter */}
         <div className="mt-6">
-        <SellerFilter
-          sellers={[...new Set(products.map((p) => p.account_id))]} // Use account_id instead
-          onFilterChange={setSelectedSeller}
-        />
+          <SellerFilter
+            sellers={[
+              ...new Map(
+                products
+                  .map((p) => {
+                    const seller = accounts.find(
+                      (acc) =>
+                        acc.account_id === p.account_id &&
+                        acc.account_type === "Seller"
+                    );
+                    return seller
+                      ? [seller.account_id, { account_id: seller.account_id, businessName: seller.businessName }]
+                      : null;
+                  })
+                  .filter((item): item is [string, { account_id: string; businessName: string }] => item !== null)
+              ).values(),
+            ]}
+            onFilterChange={setSelectedSeller}
+          />
         </div>
 
         {/* Price Filter */}
@@ -74,11 +91,10 @@ export default function ProductCatalog() {
         {/* Clear Filters Button */}
         <button
           onClick={clearFilters}
-          className="mt-6 px-4 py-2 bg-[#F1ECE2] text-[#543A27] font-semibold rounded hover:bg-[#E5E0D4] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
+          className="mt-6 px-4 py-2 bg-[#F1ECE2] text-[#543A27] font-semibold rounded border-2 border-[#543A27] hover:bg-[#E5E0D4] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
         >
           Clear Filters
         </button>
-
       </div>
 
       {/* Product Grid Section */}
