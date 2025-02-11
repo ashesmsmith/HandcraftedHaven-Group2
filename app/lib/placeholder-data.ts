@@ -49,6 +49,35 @@ const accounts = [
         email: 'anothercust@email.com',
         password: 'Abc12345',
     },
+    {
+        account_id: '92c29b64-8e5c-4e2e-ba87-e3c893ea0d09',
+        account_type: 'Seller',
+        firstName: 'Another',
+        lastName: 'Seller',
+        businessName: 'That Small Business',
+        tax_id: 1468013579,
+        address: '123 Seller Ave, Somewhere, ID, 54321',
+        phone: '333-444-5555',
+        email: 'anotherseller@email.com',
+        password: 'Abc12345',
+    },
+];
+
+const seller_profiles = [
+    {
+        profile_id: '705928ea-7708-4b9a-9e5a-602a57c8c33b',
+        account_id: accounts[1].account_id,
+        story_heading: 'Qui Wardrobe Aliquid',
+        story: 'Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite perfect nostrud nisi intricate Content. Qui international first-class nulla ut. Punctual adipliscing, essential lovely queen tempor eiusmod irure. Exclusive izakaya charming Scandinavian impeccable aute quality of life soft power pariatur Melbourne.',
+        image: '/default_profile.webp',
+    },
+    {
+        profile_id: '011d1865-ad55-4f9c-bae3-02e335f408bf',
+        account_id: accounts[4].account_id,
+        story_heading: 'Qui Wardrobe Aliquid',
+        story: 'Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite perfect nostrud nisi intricate Content. Qui international first-class nulla ut. Punctual adipliscing, essential lovely queen tempor eiusmod irure. Exclusive izakaya charming Scandinavian impeccable aute quality of life soft power pariatur Melbourne.',
+        image: '/default_profile.webp',
+    },
 ];
 
 const products = [
@@ -191,4 +220,4 @@ const reviews = [
     },
 ];
 
-export { accounts, products, orders, order_products, reviews };
+export { accounts, seller_profiles, products, orders, order_products, reviews };
