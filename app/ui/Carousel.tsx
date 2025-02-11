@@ -40,7 +40,7 @@ export default function Carousel({ images, interval = 3000 }: CarouselProps) {
   const currentImage = images[currentIndex];
 
   return (
-    <div className="relative w-full h-48 bg-light-brown flex items-center justify-center overflow-hidden">
+    <div className="relative w-full h-80 bg-light-brown flex items-center justify-center overflow-hidden">
       <div className="relative w-full h-full">
         <Link href={`/products/${currentImage.id}`}>
           <Image
