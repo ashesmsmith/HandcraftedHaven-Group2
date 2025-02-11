@@ -1,3 +1,7 @@
+// app/dashboard/seller/[acct_id]/page
+// Seller Profile Page
+// Landing page for sellers when signed in
+
 export default function SellerProfilePage() {
     return (
       <section className="container mx-auto px-6 py-10">
