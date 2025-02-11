@@ -1,6 +1,7 @@
 // app/page.tsx
 
 import { Metadata } from "next";
+import Link from "next/link";
 import Carousel from "./ui/Carousel";
 
 export const metadata: Metadata = {
@@ -8,10 +9,7 @@ export const metadata: Metadata = {
   description: "Welcome to Handcrafted Haven",
 };
 
-/** 
- * EMBEDDED PLACEHOLDER DATA
- * (You can copy this from your placeholder-data.ts, focusing on 'products' array.)
- */
+// Embedded placeholder data
 const accounts = [
   {
     account_id: "0754fa5d-1be7-4cd9-b876-143b59d4db81",
@@ -22,7 +20,7 @@ const accounts = [
     tax_id: null,
     address: "123 Admin Street, Some City, UT, 54321",
     phone: "111-111-1111",
-    email: "admin@email.com",
+    email: "[email protected]",
     password: "Abc12345",
   },
   {
@@ -34,13 +32,11 @@ const accounts = [
     tax_id: 1234567890,
     address: "456 Seller Street, Somewhere, UT, 12345",
     phone: "222-222-2222",
-    email: "seller@email.com",
+    email: "[email protected]",
     password: "Abc12345",
   },
-  // ... you can copy the rest if needed
 ];
 
-// EMBED the PRODUCTS array from your placeholder data
 const products = [
   {
     product_id: "b481438a-7dba-4aaa-8bd5-bccc03d2eb31",
@@ -108,19 +104,25 @@ export default function HomePage() {
       </h1>
       <p className="text-lg text-dark-brown/70 mb-6">Custom Creations</p>
       <div className="flex space-x-4">
-        <button className="border border-dark-brown text-dark-brown px-6 py-2 rounded hover:bg-dark-brown hover:text-cream transition-colors">
-          Button
-        </button>
-        <button className="bg-dark-brown text-cream px-6 py-2 rounded hover:bg-light-brown hover:text-white transition-colors">
-          Button
-        </button>
+        {/* Login Button */}
+        <Link href="/dashboard/auth/login">
+          <button className="border border-dark-brown text-dark-brown px-6 py-2 rounded hover:bg-dark-brown hover:text-cream transition-colors">
+            Login
+          </button>
+        </Link>
+
+        {/* Register Button*/}
+        <Link href="/dashboard/auth/signup">
+          <button className="bg-dark-brown text-cream px-6 py-2 rounded hover:bg-light-brown hover:text-white transition-colors">
+            Register
+          </button>
+        </Link>
       </div>
 
       {/* Two Carousels in a 2-column grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-10">
         <Carousel
           images={[
-            // We'll pick 2 or 3 from the product array
             {
               src: products[1].imageSRC, // Book Nerd T-Shirt
               id: products[1].product_id,
