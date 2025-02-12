@@ -18,7 +18,7 @@ export async function fetchSellerAccountById(account_id: string) {
 
         return data.rows;
     } catch (error) {
-        console.log('Error with fetchAccountById: ', error);
+        console.log('Error with fetchSellerAccountById: ', error);
     }
 }
 
@@ -26,7 +26,9 @@ export async function fetchSellerAccountById(account_id: string) {
 export async function fetchProductById(product_id: string) {
     try {
         const data = await sql<ProductsTable>`
-            SELECT * FROM products WHERE product_id = ${product_id}
+            SELECT * FROM products 
+            JOIN reviews ON products.product_id = reviews.product.id
+            WHERE product_id = ${product_id}
         `;
 
         return data.rows;
