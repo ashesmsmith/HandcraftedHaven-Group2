@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ✅ User Table (Re-Added)
+// ✅ User Table
 model User {
   id        String   @id @default(uuid())
   firstName String
@@ -31,8 +31,18 @@ model Account {
   phone        String
   email        String    @unique
   password     String
-  products     Product[] // Relationship to products
-  reviews      Review[] // Relationship to reviews
+  products     Product[]  // Relationship to products
+  reviews      Review[]   // Relationship to reviews
+  orders       Order[]    // Relationship to orders
+  sellerProfile SellerProfile? // ✅ Remove `@relation(fields, references)`
+}
+
+// ✅ Seller Profile Table (For Seller Accounts Only)
+model SellerProfile {
+  account_id   String  @id
+  businessName String
+  tax_id       Int
+  account      Account @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
 }
 
 // ✅ Product Table
@@ -42,11 +52,12 @@ model Product {
   productName String
   productDesc String
   category    String
-  color       String // ✅ Color field added back
+  color       String  // ✅ Color field added back
   price       Float
   imageSRC    String
   account     Account  @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
   reviews     Review[]
+  orderProducts OrderProduct[] // ✅ Relationship to order products
 }
 
 // ✅ Review Table
@@ -60,4 +71,30 @@ model Review {
   account    Account  @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
 
   @@id([product_id, account_id]) // Composite primary key
+}
+
+// ✅ Order Table
+model Order {
+  order_id   String   @id @default(uuid())
+  account_id String
+  date       DateTime
+  shipping   Float
+  tax        Float
+  final_total Float
+  status     String
+  account    Account @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
+  orderProducts OrderProduct[]
+}
+
+// ✅ OrderProduct Table (Many-to-Many between Orders & Products)
+model OrderProduct {
+  order_id   String
+  product_id String
+  price      Float
+  quantity   Int
+  total      Float
+  order      Order   @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  product    Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+
+  @@id([order_id, product_id]) // Composite primary key
 }
