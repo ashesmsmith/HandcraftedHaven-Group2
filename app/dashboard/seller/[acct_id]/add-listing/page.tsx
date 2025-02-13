@@ -2,12 +2,13 @@
 // Add Product Page - Only available to seller
 // Seller must be signed in
 
+import Form from '@/app/ui/product/add-form';
+
 export default function AddListingPage() {
-    return (
-      <div>
-        <h1>Add Listing</h1>
-        {/* Your page UI goes here */}
-      </div>
-    );
-  }
+  return (
+    <main>
+      <Form />
+    </main>
+  );
+}
   
