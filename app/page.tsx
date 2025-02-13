@@ -106,7 +106,7 @@ export default function HomePage() {
       <div className="flex space-x-4">
         {/* Login Button */}
         <Link href="/dashboard/auth/login">
-          <button className="border border-dark-brown text-dark-brown px-6 py-2 rounded hover:bg-dark-brown hover:text-cream transition-colors">
+          <button className="border bg-dark-green border-dark-brown text-white px-6 py-2 rounded hover:bg-dark-brown hover:text-cream transition-colors">
             Login
           </button>
         </Link>
