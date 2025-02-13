@@ -11,8 +11,10 @@ import ProductImage from "@/app/ui/product/product-image";
 import ProductDetails from "@/app/ui/product/product-details";
 import { montserrat } from "@/app/ui/fonts";
 import type { Product, Review } from "@/app/lib/placeholder-data";
+import { useParams } from "next/navigation"
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
+  const {product_id} = useParams()
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState<number | null>(null);

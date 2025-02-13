@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ✅ User Table (Re-Added)
+model User {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  address   String
+  password  String
+  createdAt DateTime @default(now())
+}
+
+// ✅ Account Table
+model Account {
+  account_id   String    @id @default(uuid())
+  account_type String
+  firstName    String
+  lastName     String
+  businessName String?
+  tax_id       Int?
+  address      String
+  phone        String
+  email        String    @unique
+  password     String
+  products     Product[] // Relationship to products
+  reviews      Review[] // Relationship to reviews
+}
+
+// ✅ Product Table
+model Product {
+  product_id  String   @id @default(uuid())
+  account_id  String
+  productName String
+  productDesc String
+  category    String
+  color       String // ✅ Color field added back
+  price       Float
+  imageSRC    String
+  account     Account  @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
+  reviews     Review[]
+}
+
+// ✅ Review Table
+model Review {
+  product_id String
+  account_id String
+  stars      Int
+  review     String
+  date       DateTime
+  product    Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+  account    Account  @relation(fields: [account_id], references: [account_id], onDelete: Cascade)
+
+  @@id([product_id, account_id]) // Composite primary key
+}

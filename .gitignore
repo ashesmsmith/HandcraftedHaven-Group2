@@ -10,6 +10,12 @@
 !.yarn/releases
 !.yarn/versions
 
+# environment variables (DO NOT COMMIT private keys)
+.env
+.env.local
+.env.development
+.env.production
+
 # testing
 /coverage
 
@@ -30,8 +36,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# optional: keep .env.example to share expected env variables
+!.env.example
 
 # vercel
 .vercel
