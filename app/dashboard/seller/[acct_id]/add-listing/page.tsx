@@ -1,5 +1,6 @@
-// dashboard/seller/add-listing/page.tsx
-// Purpose: Provides a form for the seller to add new product listings to their inventory.
+// dashboard/seller/[acct_id]/add-listing/page.tsx
+// Add Product Page - Only available to seller
+// Seller must be signed in
 
 export default function AddListingPage() {
     return (
