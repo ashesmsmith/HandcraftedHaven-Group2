@@ -27,7 +27,6 @@ export async function fetchProductById(product_id: string) {
     try {
         const data = await sql<ProductsTable>`
             SELECT * FROM products 
-            JOIN reviews ON products.product_id = reviews.product.id
             WHERE product_id = ${product_id}
         `;
 
