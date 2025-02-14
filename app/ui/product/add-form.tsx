@@ -1,21 +1,21 @@
 'use client'
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { addListing } from "@/app/lib/actions";
 
 export default function Form() {
     const searchParams = useSearchParams();
-    const acct_id = searchParams.get('acct_id');
+    const acct_id = searchParams.get('acct_id') || '';
 
     const [prodCategory, setProdCategory] = useState('');
     const [prodColor, setProdColor] = useState('');
 
-    const handleCategoryChange = (event) => {
+    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setProdCategory(event.target.value);
     };
 
-    const handleColorChange = (event) => {
+    const handleColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setProdColor(event.target.value);
     };
 
