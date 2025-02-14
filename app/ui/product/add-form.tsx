@@ -1,21 +1,21 @@
 'use client'
 
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useParams } from "next/navigation";
+import React, { useState } from "react";
 import { addListing } from "@/app/lib/actions";
 
-export default function Form() {
-    const searchParams = useSearchParams();
-    const acct_id = searchParams.get('acct_id');
+export default function AddListingForm() {
+    const params = useParams();
+    const acct_id = params.acct_id;
 
     const [prodCategory, setProdCategory] = useState('');
     const [prodColor, setProdColor] = useState('');
 
-    const handleCategoryChange = (event) => {
+    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setProdCategory(event.target.value);
     };
 
-    const handleColorChange = (event) => {
+    const handleColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setProdColor(event.target.value);
     };
 
@@ -25,36 +25,36 @@ export default function Form() {
             <h1 className="text-2xl font-bold mb-4 font-serif text-dark-brown">Add Listing</h1>
                 <form action={addListing} className="space-y-4">
                     {/* Hidden Input to hold acct_id for inserting product to db */}
-                    <input id="acct_id" name="acct_id" type="hidden" value={acct_id}></input>
+                    <input id="account_id" name="account_id" type="hidden" value={acct_id}></input>
                     
-                    <label htmlFor="prod_name" className="block mb-1 font-medium text-dark-brown">
+                    <label htmlFor="productName" className="block mb-1 font-medium text-dark-brown">
                         Name:
                     </label>
                     <input 
-                        id="prod_name" 
-                        name="prod_name" 
+                        id="productName" 
+                        name="productName" 
                         type="text" 
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
                     />
 
-                    <label htmlFor="prod_desc" className="block mb-1 font-medium text-dark-brown">
+                    <label htmlFor="productDesc" className="block mb-1 font-medium text-dark-brown">
                         Description:
                     </label>
                     <input 
-                        id="prod_desc" 
-                        name="prod_desc" 
+                        id="productDesc" 
+                        name="productDesc" 
                         type="text" 
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
                     />
 
-                    <label htmlFor="prod_category" className="block mb-1 font-medium text-dark-brown">
+                    <label htmlFor="category" className="block mb-1 font-medium text-dark-brown">
                         Category:
                     </label>
                     <select 
-                        id="prod_category" 
-                        name="prod_category" 
+                        id="category" 
+                        name="category" 
                         value={prodCategory}
                         onChange={handleCategoryChange}
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
@@ -69,12 +69,12 @@ export default function Form() {
                         <option value="Other">Other</option>
                     </select>
 
-                    <label htmlFor="prod_color" className="block mb-1 font-medium text-dark-brown">
+                    <label htmlFor="color" className="block mb-1 font-medium text-dark-brown">
                         Color:
                     </label>
                     <select
-                        id="prod_color" 
-                        name="prod_color" 
+                        id="color" 
+                        name="color" 
                         value={prodColor}
                         onChange={handleColorChange}
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
@@ -95,23 +95,23 @@ export default function Form() {
                         <option value="Multi">Multi</option>
                     </select>
 
-                    <label htmlFor="prod_price" className="block mb-1 font-medium text-dark-brown">
+                    <label htmlFor="price" className="block mb-1 font-medium text-dark-brown">
                         Price:
                     </label>
                     <input 
-                        id="prod_price" 
-                        name="prod_price" 
+                        id="price" 
+                        name="price" 
                         type="number" 
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
                     />
 
-                    <label htmlFor="prod_image" className="block mb-1 font-medium text-dark-brown">
+                    <label htmlFor="imageSRC" className="block mb-1 font-medium text-dark-brown">
                         Image:
                     </label>
                     <input 
-                        id="prod_image" 
-                        name="prod_image" 
+                        id="imageSRC" 
+                        name="imageSRC" 
                         type="text" 
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
