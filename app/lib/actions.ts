@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 const AddListingFormSchema = z.object({
     account_id: z.string(),
@@ -33,4 +34,5 @@ export async function addListing(formData: FormData) {
     `;
 
     revalidatePath(`/dashboard/seller/${account_id}`);
+    redirect(`/dashboard/seller/${account_id}`);
 }
