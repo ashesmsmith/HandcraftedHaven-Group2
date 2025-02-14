@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { addListing } from "@/app/lib/actions";
 
-export default function Form() {
+export default function AddListingForm() {
     const params = useParams();
     const acct_id = params.acct_id;
 
