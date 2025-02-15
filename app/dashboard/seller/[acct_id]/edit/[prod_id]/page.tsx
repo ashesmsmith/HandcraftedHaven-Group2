@@ -3,16 +3,19 @@
 // Seller must be signed in
 
 import EditListingForm from '@/app/ui/product/edit-form';
-//import { fetchProductById } from '@/app/lib/data';
+import { fetchProductById } from '@/app/lib/data';
 
 
-export default function EditListingPage() {
+export default async function EditListingPage(props: { params: Promise<{ acct_id: string, prod_id: string }> }) {
+    const params = await props.params;
+    const acct_id = params.acct_id;
+    const prod_id = params.prod_id;
 
-  // We need to access the product data to pass current data into the form 
+    const product = await fetchProductById(prod_id);
 
   return (
     <main>
-      <EditListingForm />
+      <EditListingForm product={product} prod_id={prod_id} acct_id={acct_id}/>
     </main>
   )
 }
