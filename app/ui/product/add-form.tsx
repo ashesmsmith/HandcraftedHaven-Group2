@@ -113,6 +113,7 @@ export default function AddListingForm() {
                         id="imageSRC" 
                         name="imageSRC" 
                         type="text" 
+                        defaultValue="/public/prod_images/no-image.png"
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
                     />
