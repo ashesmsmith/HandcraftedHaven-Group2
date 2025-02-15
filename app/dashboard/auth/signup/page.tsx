@@ -10,6 +10,7 @@ export default function SignUpPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [businessName, setBusinessName] = useState("");
+  const [accountType, setAccountType] = useState("Seller");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -28,16 +29,14 @@ export default function SignUpPage() {
     }
 
     try {
-      const account_type = "Seller";
-
-      // Call our /api/auth/register route
+      // Call  /api/auth/register route
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           password,
-          account_type,
+          account_type: accountType,
           firstName,
           lastName,
           businessName
@@ -95,7 +94,7 @@ export default function SignUpPage() {
             />
           </div>
 
-          {/* Confirm */}
+          {/* Confirm Password */}
           <div>
             <label htmlFor="confirm-password" className="block mb-1 font-medium text-dark-brown">
               Confirm Password
@@ -139,6 +138,19 @@ export default function SignUpPage() {
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
             />
+          </div>
+
+          {/* New: Account Type selection */}
+          <div>
+            <label className="block mb-1 font-medium text-dark-brown">Account Type</label>
+            <select
+              className="w-full border border-dark-brown/20 px-3 py-2 rounded"
+              value={accountType}
+              onChange={(e) => setAccountType(e.target.value)}
+            >
+              <option value="Seller">Seller</option>
+              <option value="Customer">Customer</option>
+            </select>
           </div>
 
           {/* Error */}
