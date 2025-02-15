@@ -2,11 +2,17 @@
 // Edit Product Page - Only available to seller that owns the product
 // Seller must be signed in
 
+import EditListingForm from '@/app/ui/product/edit-form';
+//import { fetchProductById } from '@/app/lib/data';
+
+
 export default function EditListingPage() {
 
+  // We need to access the product data to pass current data into the form 
+
   return (
-    <div>
-      <h1>Edit Listing</h1>
-    </div>
+    <main>
+      <EditListingForm />
+    </main>
   )
 }

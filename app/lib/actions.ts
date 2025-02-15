@@ -36,3 +36,8 @@ export async function addListing(formData: FormData) {
     revalidatePath(`/dashboard/seller/${account_id}`);
     redirect(`/dashboard/seller/${account_id}`);
 }
+
+
+export async function editListing() {
+    //Functionality for updating the product in database
+}
