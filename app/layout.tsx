@@ -1,9 +1,9 @@
 // app/layout.tsx
+
 import "./globals.css";
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
-
+import NavBar from "./ui/NavBar"; 
+import Footer from "./ui/Footer"; 
 
 export const metadata: Metadata = {
   title: "Handcrafted Haven",
@@ -18,89 +18,10 @@ export default function RootLayout({
   return (
 
     <html lang="en">
-      <body className="font-sans antialiased min-h-screen flex flex-col bg-cream text-dark-brown overflow-y-auto">
-        {/* --- HEADER (site-wide) --- */}
-        <header className="border-b border-dark-brown/20 bg-light-green">
-          <div className="container mx-auto flex items-center justify-between py-4 px-6">
-            {/* Logo (Big) */}
-            <div className="flex items-center space-x-2">
-              <Image
-                src="/logo.webp"
-                alt="Handcrafted Haven Logo"
-                width={50}
-                height={50}
-                priority
-              />
-              <div className="font-bold text-xl font-serif">Handcrafted Haven</div>
-            </div>
-
-            {/* Nav Links */}
-            <nav className="hidden md:flex items-center space-x-6">
-              {/* Add more links if needed */}
-            </nav>
-
-            {/* Auth Buttons */}
-            <div className="flex items-center space-x-4">
-              <Link href="/vendor" className="hover:text-dark-green">
-                Vendor Login
-              </Link>
-              <Link href="/dashboard/auth/login">
-                <button className="bg-dark-green text-white py-2 px-4 rounded hover:bg-light-green hover:text-dark-brown transition-colors">
-                  Customer Login
-                </button>
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* --- MAIN CONTENT (children) --- */}
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-cream text-dark-brown">
+        <NavBar />
         <main className="flex-grow">{children}</main>
-
-        {/* --- FOOTER (site-wide) --- */}
-        <footer className="border-t border-dark-brown/20 bg-light-green">
-          <div className="container mx-auto py-10 px-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
-              {/* Footer Logo / Social Icons */}
-              <div className="flex items-center space-x-4">
-                <Image
-                  src="/sm-logo.webp"
-                  alt="Handcrafted Haven Small Logo"
-                  width={30}
-                  height={30}
-                />
-                <div className="font-bold text-xl font-serif">Handcrafted Haven</div>
-                {/* Existing placeholders for social icons - you can replace with actual icons */}
-                <div className="flex space-x-2">
-                  By Group 2
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Links (currently empty grid) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Add more footer link columns here if desired */}
-            </div>
-
-            {/* Bottom Row: Social Media + Copyright */}
-            <div className="mt-8 flex flex-col md:flex-row items-center justify-between">
-              {/* Example row for Facebook, Instagram, LinkedIn */}
-              <div className="flex space-x-4 text-sm">
-                <Link href="#" className="hover:text-dark-green">
-                  Facebook
-                </Link>
-                <Link href="#" className="hover:text-dark-green">
-                  Instagram
-                </Link>
-                <Link href="#" className="hover:text-dark-green">
-                  LinkedIn
-                </Link>
-              </div>
-              <p className="text-sm text-dark-brown mt-4 md:mt-0">
-                &copy; {new Date().getFullYear()} Handcrafted Haven. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

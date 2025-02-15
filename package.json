@@ -7,17 +7,14 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prisma:seed": "npx prisma db seed"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@prisma/client": "^6.3.1",
     "@vercel/postgres": "^0.10.0",
     "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
     "next": "^15.1.6",
+    "pg": "^8.13.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -31,7 +28,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.5",
     "postcss": "^8.5.1",
-    "prisma": "^6.3.1",
     "tailwindcss": "^3.4.17",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",

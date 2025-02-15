@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node"],  // ✅ Add this to enable `process.env` support
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,

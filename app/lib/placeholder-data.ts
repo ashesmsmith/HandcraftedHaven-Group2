@@ -50,6 +50,35 @@ const accounts = [
         email: 'anothercust@email.com',
         password: 'Abc12345',
     },
+    {
+        account_id: '92c29b64-8e5c-4e2e-ba87-e3c893ea0d09',
+        account_type: 'Seller',
+        firstName: 'Another',
+        lastName: 'Seller',
+        businessName: 'That Small Business',
+        tax_id: 1468013579,
+        address: '123 Seller Ave, Somewhere, ID, 54321',
+        phone: '333-444-5555',
+        email: 'anotherseller@email.com',
+        password: 'Abc12345',
+    },
+];
+
+const seller_profiles = [
+    {
+        profile_id: '705928ea-7708-4b9a-9e5a-602a57c8c33b',
+        account_id: accounts[1].account_id,
+        story_heading: 'Qui Wardrobe Aliquid',
+        story: 'Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite perfect nostrud nisi intricate Content. Qui international first-class nulla ut. Punctual adipliscing, essential lovely queen tempor eiusmod irure. Exclusive izakaya charming Scandinavian impeccable aute quality of life soft power pariatur Melbourne.',
+        image: '/default_profile.webp',
+    },
+    {
+        profile_id: '011d1865-ad55-4f9c-bae3-02e335f408bf',
+        account_id: accounts[4].account_id,
+        story_heading: 'Qui Wardrobe Aliquid',
+        story: 'Excepteur efficient emerging, minim veniam anim aute carefully curated Ginza conversation exquisite perfect nostrud nisi intricate Content. Qui international first-class nulla ut. Punctual adipliscing, essential lovely queen tempor eiusmod irure. Exclusive izakaya charming Scandinavian impeccable aute quality of life soft power pariatur Melbourne.',
+        image: '/default_profile.webp',
+    },
 ];
 
 const products = [
@@ -193,103 +222,3 @@ const reviews = [
 ];
 
 export { accounts, products, orders, order_products, reviews };
-
-
-// Data Types: Defining explicit data types (e.g., Product, Review, Account) ensures type safety, 
-// prevents errors, and improves code clarity. This helps maintain consistency in function 
-// parameters and return values, making it easier to debug and extend the application.
-
-//Data Types:
-
-export type Product = {
-    product_id: string;
-    account_id: string;
-    productName: string;
-    productDesc: string;
-    category: string;
-    price: number;
-    imageSRC: string;
-}
-
-export type Review = {
-    product_id: string;
-    account_id: string;
-    stars: number;
-    review: string;
-    date: string;
-};
-
-
-
-// The Account type represents all user accounts. 
-// Only 'Seller' accounts include 'businessName' and 'tax_id', 
-// while 'Admin' and 'Customer' accounts do not need these properties.
-
-export type Account = {
-    account_id: string;
-    account_type: 'Admin' | 'Seller' | 'Customer';
-    firstName: string;
-    lastName: string;
-    businessName?: string;
-    tax_id?: number;
-    address: string;
-    phone: string;
-    email: string;
-    password: string;
-};
-
-export type Seller = Account & {
-    account_type: 'Seller';
-    businessName: string; // Only sellers have business names
-};
-
-// =====================================================
-// Functions for Fetching and Processing Data
-// =====================================================
-
-
-//Fetch product by ID
-export async function fetchProductById(product_id: string): Promise<Product | undefined> {
-    return products.find((product) => product.product_id === product_id);
-}
-
-//Fetch review by ID
-export async function fetchReviewByID(product_id: string): Promise<Review | undefined> {
-    return reviews.find((review) => review.product_id === product_id);
-}
-
-//Fetch all reviews by product ID
-export async function fetchReviewsByProductID(product_id: string): Promise<Review[]> {
-    return reviews.filter((review) => review.product_id === product_id);
-}
-
-
-//Fetch all products
-export async function fetchAllProducts(): Promise<Product[]> {
-  return products;
-}
-
-//Fetch products by category
-export async function fetchProductsByCategory(category: string): Promise<Product[]> {
-  return products.filter((product) => product.category === category);
-}
-
-// Fetch products by seller
-export async function fetchProductsBySeller(seller: Seller): Promise<Product[]> {
-    return products.filter((product) => product.account_id === seller.account_id);
-}
-
-// Fetch products sorted by price
-export async function fetchProductsByPrice(order: 'asc' | 'desc' = 'asc'): Promise<Product[]> {
-    if (!products || products.length === 0) return []; // Return empty array if products are missing
-    return [...products].sort((a, b) => (order === 'asc' ? a.price - b.price : b.price - a.price));
-  }
-  
-// Calculate the average rating for a product
-export async function calculateAverageRating(product_id: string): Promise<number> {
-    const productReviews = reviews.filter((review) => review.product_id === product_id);
-    if (productReviews.length === 0) return 0; // Prevents division by zero
-    const totalStars = productReviews.reduce((sum, review) => sum + Number(review.stars), 0);
-    return totalStars / productReviews.length;
-  }
-  

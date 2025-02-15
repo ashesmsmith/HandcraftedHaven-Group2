@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { db } from '@vercel/postgres';
-import { accounts, products, orders, reviews, order_products } from '../lib/placeholder-data';
+import { accounts, seller_profiles, products, orders, reviews, order_products } from '../lib/placeholder-data';
 
 const client = await db.connect();
 
@@ -13,12 +13,8 @@ function sanitizeInput(input: string): string {
 }
 
 async function checkIfTypeExists(typeName: string, typeDefinition: string): Promise<void> {
-  console.log('Check if TYPE exists: ', typeName, typeDefinition);
-
   typeName = sanitizeInput(typeName);
   typeDefinition = sanitizeInput(typeDefinition);
-
-  console.log('Sanitized: ', typeName, typeDefinition);
 
   const sql: string=`
     DO $$
@@ -55,7 +51,7 @@ async function seedAccounts() {
     accounts.map(async (account) => {
       const hashedPassword = await bcrypt.hash(account.password, 10);
       return client.sql`
-        INSERT INTO accounts(
+        INSERT INTO accounts (
           account_id, 
           account_type, 
           firstName, 
@@ -85,6 +81,43 @@ async function seedAccounts() {
   );
 
   return insertedAccounts;
+}
+
+async function seedSellerProfiles() {
+  await client.sql`
+    CREATE TABLE IF NOT EXISTS seller_profiles (
+      profile_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      account_id UUID NOT NULL,
+      story_heading VARCHAR(255),
+      story TEXT NOT NULL,
+      image TEXT NOT NULL DEFAULT '/default_profile.webp',
+      FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+    );
+  `;
+
+  const insertedSellerProfiles = await Promise.all(
+    seller_profiles.map(async (profile) => {
+      return client.sql`
+        INSERT INTO seller_profiles (
+          profile_id,  
+          account_id, 
+          story_heading, 
+          story, 
+          image 
+        )
+        VALUES (
+          ${profile.profile_id},
+          ${profile.account_id},
+          ${profile.story_heading},
+          ${profile.story},
+          ${profile.image}
+        )
+        ON CONFLICT (profile_id) DO NOTHING;
+      `;
+    }),
+  );
+
+  return insertedSellerProfiles;
 }
 
 async function seedProducts() {
@@ -255,6 +288,7 @@ export async function GET() {
   try {
     await client.sql`BEGIN`;
     await seedAccounts();
+    await seedSellerProfiles();
     await seedProducts();
     await seedOrders();
     await seedOrder_Products();
