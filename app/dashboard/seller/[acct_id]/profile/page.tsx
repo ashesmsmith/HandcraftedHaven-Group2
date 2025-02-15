@@ -11,9 +11,9 @@ export default function SellerProfileEditablePage() {
   const [businessName, setBusinessName] = useState("");
   const [storyHeading, setStoryHeading] = useState("");
   const [story, setStory] = useState("");
+  const [image, setImage] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
   const [loading, setLoading] = useState(true);
-
   const router = useRouter();
 
   useEffect(() => {
@@ -32,6 +32,7 @@ export default function SellerProfileEditablePage() {
         setBusinessName(sellerData.businessname || "");
         setStoryHeading(sellerData.story_heading || "");
         setStory(sellerData.story || "");
+        setImage(sellerData.image || "/default_profile.webp");
       } catch (err) {
         setStatusMsg(
           err instanceof Error ? err.message : "Error loading profile."
@@ -46,12 +47,14 @@ export default function SellerProfileEditablePage() {
   async function handleSave() {
     try {
       setStatusMsg("");
+
       const updateData = {
         firstName,
         lastName,
         businessName,
         story_heading: storyHeading,
         story,
+        image,
       };
 
       console.log("📤 Sending update request:", updateData);
@@ -63,7 +66,7 @@ export default function SellerProfileEditablePage() {
       });
 
       const responseBody = await res.json();
-      console.log(" API Response:", responseBody);
+      console.log("📩 API Response:", responseBody);
 
       if (!res.ok) {
         throw new Error(`Update failed: ${responseBody.error}`);
@@ -139,6 +142,18 @@ export default function SellerProfileEditablePage() {
             value={story}
             onChange={(e) => setStory(e.target.value)}
             rows={5}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        {/* New: Profile Picture URL */}
+        <div>
+          <label className="block mb-1 font-semibold">Profile Picture URL</label>
+          <input
+            type="text"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            placeholder="Enter image URL or leave blank for default"
             className="w-full border p-2 rounded"
           />
         </div>

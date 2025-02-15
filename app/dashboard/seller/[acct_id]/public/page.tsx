@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 
-// A public seller profile
 export default function SellerProfilePublicPage() {
   const { acct_id } = useParams() as { acct_id: string };
   const [sellerName, setSellerName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [storyHeading, setStoryHeading] = useState("");
   const [story, setStory] = useState("");
+  const [image, setImage] = useState("/default_profile.webp");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +25,7 @@ export default function SellerProfilePublicPage() {
         setBusinessName(data.businessname || "Independent Seller");
         setStoryHeading(data.story_heading || "");
         setStory(data.story || "");
+        setImage(data.image || "/default_profile.webp");
       } catch (err) {
         console.error("Error:", err);
       } finally {
@@ -38,11 +39,18 @@ export default function SellerProfilePublicPage() {
 
   return (
     <section className="container mx-auto px-6 py-10">
+      {/* Profile Picture */}
+      <div className="flex justify-center mb-6">
+        <img
+          src={image}
+          alt={`${sellerName} profile picture`}
+          className="w-32 h-32 rounded-full object-cover border"
+        />
+      </div>
+
       {/* Seller Name and Business */}
       <h1 className="text-3xl font-bold font-serif mb-2">{sellerName}</h1>
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">
-        {businessName}
-      </h2>
+      <h2 className="text-xl font-semibold text-gray-700 mb-4">{businessName}</h2>
 
       {/* Story Section */}
       <div className="bg-white p-6 rounded shadow space-y-4">
