@@ -30,13 +30,10 @@ export async function fetchSellerAccountById(account_id: string) {
 // Fetch an individual Product by ID
 export async function fetchProductById(product_id: string) {
   try {
-    // Use “reviews.product_id” to match “products.product_id”
-    // Also fully qualify the WHERE clause: “WHERE products.product_id = ${product_id}”
     const data = await sql<ProductsTable>`
       SELECT *
       FROM products
-      JOIN reviews ON products.product_id = reviews.product_id
-      WHERE products.product_id = ${product_id}
+      WHERE product_id = ${product_id}
     `;
 
     return data.rows;
