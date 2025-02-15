@@ -1,36 +1,40 @@
-import bcrypt from 'bcrypt';
-import { db } from '@vercel/postgres';
-import { accounts, seller_profiles, products, orders, reviews, order_products } from '../../lib/placeholder-data';
+import bcrypt from "bcrypt";
+import { db } from "@vercel/postgres";
+import {
+  accounts,
+  seller_profiles,
+  products,
+  orders,
+  reviews,
+  order_products,
+} from "@/app/lib/placeholder-data";
 
+// Connect once (for this route)
 const client = await db.connect();
 
 await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-function sanitizeInput(input: string): string {
-  // Allow only alphanumeric characters, underscores, and commas (specific to ENUM)
-  const sanitized = input.replace(/[^a-zA-Z0-9_,\s']/g, "");
-  return sanitized;
-}
-
-async function checkIfTypeExists(typeName: string, typeDefinition: string): Promise<void> {
-  typeName = sanitizeInput(typeName);
-  typeDefinition = sanitizeInput(typeDefinition);
-
-  const sql: string=`
+/**
+ * CREATE TYPE acct_type AS ENUM ('Admin','Seller','Customer')
+ */
+async function checkIfTypeExists(typeName: string, typeDefEscaped: string) {
+  // Example usage:
+  //  checkIfTypeExists("acct_type", "''Admin'',''Seller'',''Customer''");
+  const sql = `
     DO $$
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = '${typeName}') THEN
-            EXECUTE 'CREATE TYPE ' || quote_ident(${typeName}) || ' AS ENUM (' || ${typeDefinition} || ')';
-        END IF;
+      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = '${typeName}') THEN
+        EXECUTE 'CREATE TYPE ${typeName} AS ENUM (${typeDefEscaped})';
+      END IF;
     END;
     $$;
   `;
-
   await client.query(sql);
 }
 
 async function seedAccounts() {
-  await checkIfTypeExists('acct_type', "'Admin', 'Seller', 'Customer'");
+  // Pass double-escaped enumerations:
+  await checkIfTypeExists("acct_type", "''Admin'',''Seller'',''Customer''");
 
   await client.sql`
     CREATE TABLE IF NOT EXISTS accounts (
@@ -52,15 +56,15 @@ async function seedAccounts() {
       const hashedPassword = await bcrypt.hash(account.password, 10);
       return client.sql`
         INSERT INTO accounts (
-          account_id, 
-          account_type, 
-          firstName, 
-          lastName, 
-          businessName, 
-          tax_id, 
-          address, 
-          phone, 
-          email, 
+          account_id,
+          account_type,
+          firstName,
+          lastName,
+          businessName,
+          tax_id,
+          address,
+          phone,
+          email,
           password
         )
         VALUES (
@@ -77,7 +81,7 @@ async function seedAccounts() {
         )
         ON CONFLICT (account_id) DO NOTHING;
       `;
-    }),
+    })
   );
 
   return insertedAccounts;
@@ -96,14 +100,14 @@ async function seedSellerProfiles() {
   `;
 
   const insertedSellerProfiles = await Promise.all(
-    seller_profiles.map(async (profile) => {
-      return client.sql`
+    seller_profiles.map((profile) =>
+      client.sql`
         INSERT INTO seller_profiles (
-          profile_id,  
-          account_id, 
-          story_heading, 
-          story, 
-          image 
+          profile_id,
+          account_id,
+          story_heading,
+          story,
+          image
         )
         VALUES (
           ${profile.profile_id},
@@ -113,16 +117,24 @@ async function seedSellerProfiles() {
           ${profile.image}
         )
         ON CONFLICT (profile_id) DO NOTHING;
-      `;
-    }),
+      `
+    )
   );
 
   return insertedSellerProfiles;
 }
 
 async function seedProducts() {
-  await checkIfTypeExists('category_type', "'Pottery', 'Clothing', 'Jewelry', 'Stickers', 'Woodworking', 'Other'");
-  await checkIfTypeExists('color_type', "'Black', 'White', 'Gray', 'Brown', 'Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Multi'");
+  // Double-escape for category_type
+  await checkIfTypeExists(
+    "category_type",
+    "''Pottery'',''Clothing'',''Jewelry'',''Stickers'',''Woodworking'',''Other''"
+  );
+  // Double-escape for color_type
+  await checkIfTypeExists(
+    "color_type",
+    "''Black'',''White'',''Gray'',''Brown'',''Red'',''Orange'',''Yellow'',''Green'',''Blue'',''Purple'',''Pink'',''Multi''"
+  );
 
   await client.sql`
     CREATE TABLE IF NOT EXISTS products (
@@ -139,36 +151,39 @@ async function seedProducts() {
   `;
 
   const insertedProducts = await Promise.all(
-    products.map((product) => client.sql`
-      INSERT INTO products (
-        product_id,
-        account_id,
-        productName,
-        productDesc,
-        category,
-        color,
-        price,
-        imageSRC
-      )
-      VALUES (
-        ${product.product_id},
-        ${product.account_id},
-        ${product.productName},
-        ${product.productDesc},
-        ${product.category},
-        ${product.color},
-        ${product.price},
-        ${product.imageSRC}
-      )
-      ON CONFLICT (product_id) DO NOTHING;
-    `),
+    products.map((product) =>
+      client.sql`
+        INSERT INTO products (
+          product_id,
+          account_id,
+          productName,
+          productDesc,
+          category,
+          color,
+          price,
+          imageSRC
+        )
+        VALUES (
+          ${product.product_id},
+          ${product.account_id},
+          ${product.productName},
+          ${product.productDesc},
+          ${product.category},
+          ${product.color},
+          ${product.price},
+          ${product.imageSRC}
+        )
+        ON CONFLICT (product_id) DO NOTHING;
+      `
+    )
   );
 
   return insertedProducts;
 }
 
 async function seedOrders() {
-  await checkIfTypeExists('status_type', "'Processed', 'Shipped', 'Canceled'");
+  // Double-escape for status_type
+  await checkIfTypeExists("status_type", "''Processed'',''Shipped'',''Canceled''");
 
   await client.sql`
     CREATE TABLE IF NOT EXISTS orders (
@@ -184,27 +199,29 @@ async function seedOrders() {
   `;
 
   const insertedOrders = await Promise.all(
-    orders.map((order) => client.sql`
-      INSERT INTO orders (
-        order_id,
-        account_id,
-        date,
-        shipping,
-        tax,
-        final_total,
-        status
-      )
-      VALUES (
-        ${order.order_id},
-        ${order.account_id},
-        ${order.date}::DATE,
-        ${order.shipping},
-        ${order.tax},
-        ${order.final_total},
-        ${order.status}
-      )
-      ON CONFLICT (order_id) DO NOTHING;
-    `),
+    orders.map((order) =>
+      client.sql`
+        INSERT INTO orders (
+          order_id,
+          account_id,
+          date,
+          shipping,
+          tax,
+          final_total,
+          status
+        )
+        VALUES (
+          ${order.order_id},
+          ${order.account_id},
+          ${order.date}::DATE,
+          ${order.shipping},
+          ${order.tax},
+          ${order.final_total},
+          ${order.status}
+        )
+        ON CONFLICT (order_id) DO NOTHING;
+      `
+    )
   );
 
   return insertedOrders;
@@ -225,23 +242,25 @@ async function seedOrder_Products() {
   `;
 
   const insertedOrder_Products = await Promise.all(
-    order_products.map((order_product) => client.sql`
-      INSERT INTO order_products (
-        order_id,
-        product_id,
-        price,
-        quantity,
-        total
-      )
-      VALUES (
-        ${order_product.order_id},
-        ${order_product.product_id},
-        ${order_product.price},
-        ${order_product.quantity},
-        ${order_product.total}
-      )
-      ON CONFLICT (order_id, product_id) DO NOTHING;
-    `),
+    order_products.map((op) =>
+      client.sql`
+        INSERT INTO order_products (
+          order_id,
+          product_id,
+          price,
+          quantity,
+          total
+        )
+        VALUES (
+          ${op.order_id},
+          ${op.product_id},
+          ${op.price},
+          ${op.quantity},
+          ${op.total}
+        )
+        ON CONFLICT (order_id, product_id) DO NOTHING;
+      `
+    )
   );
 
   return insertedOrder_Products;
@@ -262,28 +281,33 @@ async function seedReviews() {
   `;
 
   const insertedReviews = await Promise.all(
-    reviews.map((review) => client.sql`
-      INSERT INTO reviews (
-        product_id,
-        account_id,
-        stars,
-        review,
-        date
-      )
-      VALUES (
-        ${review.product_id},
-        ${review.account_id},
-        ${review.stars},
-        ${review.review},
-        ${review.date}::DATE
-      )
-      ON CONFLICT (product_id, account_id) DO NOTHING;
-    `),
+    reviews.map((r) =>
+      client.sql`
+        INSERT INTO reviews (
+          product_id,
+          account_id,
+          stars,
+          review,
+          date
+        )
+        VALUES (
+          ${r.product_id},
+          ${r.account_id},
+          ${r.stars},
+          ${r.review},
+          ${r.date}::DATE
+        )
+        ON CONFLICT (product_id, account_id) DO NOTHING;
+      `
+    )
   );
 
   return insertedReviews;
 }
 
+/**
+ * GET /api/seed
+ */
 export async function GET() {
   try {
     await client.sql`BEGIN`;
@@ -296,16 +320,15 @@ export async function GET() {
     await client.sql`COMMIT`;
 
     return new Response(
-      JSON.stringify({ message: 'Database seeded successfully' }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ message: "Database seeded successfully" }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error('Error Seeding Database: ', error);
+    console.error("Error Seeding Database: ", error);
     await client.sql`ROLLBACK`;
-
     return new Response(JSON.stringify({ error, status: 500 }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
 }

@@ -1,64 +1,163 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { SellerAccountsTable } from "@/app/lib/definitions";
+import { useParams, useRouter } from "next/navigation";
 
-export default function SellerProfilePage() {
+export default function SellerProfileEditablePage() {
   const { acct_id } = useParams() as { acct_id: string };
-  const [seller, setSeller] = useState<SellerAccountsTable | null>(null);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [storyHeading, setStoryHeading] = useState("");
+  const [story, setStory] = useState("");
+  const [statusMsg, setStatusMsg] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const router = useRouter();
+
   useEffect(() => {
-    async function loadSellerData() {
+    async function loadProfile() {
       try {
+        setLoading(true);
         const res = await fetch(`/api/seller/${acct_id}`);
         if (!res.ok) {
-          console.error("Error fetching seller data:", await res.text());
-          return;
+          throw new Error(`Profile load failed: ${await res.text()}`);
         }
-        const data = await res.json();
-        setSeller(data);
-      } catch (error) {
-        console.error("Error loading seller data:", error);
+        const sellerData = await res.json();
+        console.log("🔍 Loaded Seller Data:", sellerData);
+
+        setFirstName(sellerData.firstname || "");
+        setLastName(sellerData.lastname || "");
+        setBusinessName(sellerData.businessname || "");
+        setStoryHeading(sellerData.story_heading || "");
+        setStory(sellerData.story || "");
+      } catch (err) {
+        setStatusMsg(
+          err instanceof Error ? err.message : "Error loading profile."
+        );
       } finally {
         setLoading(false);
       }
     }
-
-    loadSellerData();
+    loadProfile();
   }, [acct_id]);
 
-  if (loading) {
-    return <p>Loading seller profile...</p>;
+  async function handleSave() {
+    try {
+      setStatusMsg("");
+      const updateData = {
+        firstName,
+        lastName,
+        businessName,
+        story_heading: storyHeading,
+        story,
+      };
+
+      console.log("📤 Sending update request:", updateData);
+
+      const res = await fetch(`/api/seller/${acct_id}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+
+      const responseBody = await res.json();
+      console.log(" API Response:", responseBody);
+
+      if (!res.ok) {
+        throw new Error(`Update failed: ${responseBody.error}`);
+      }
+
+      setStatusMsg("Profile updated successfully!");
+    } catch (err) {
+      setStatusMsg(err instanceof Error ? err.message : "An error occurred.");
+    }
   }
 
-  if (!seller) {
-    return <p>Seller profile not found.</p>;
+  if (loading) {
+    return <div className="p-4">Loading profile...</div>;
   }
 
   return (
     <section className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold font-serif text-dark-brown">
-        {seller.firstName} {seller.lastName}'s Profile
+      <h1 className="text-3xl font-bold font-serif text-dark-brown mb-4">
+        Edit Profile for {firstName} {lastName}
       </h1>
-      <p className="text-lg text-gray-600">Manage your business details below.</p>
 
-      <div className="mt-6 bg-white p-6 rounded shadow">
-        <label className="block mb-2 text-lg font-semibold">Business Name</label>
-        <input
-          type="text"
-          value={seller.businessName ?? ""}
-          disabled
-          className="w-full border p-2 rounded bg-gray-100"
-        />
+      {statusMsg && <div className="mb-4 text-red-600">{statusMsg}</div>}
 
-        <label className="block mt-4 mb-2 text-lg font-semibold">Your Story</label>
-        <textarea
-          value={seller.story}
-          onChange={(e) => /* handle saving if needed */ null}
-          className="w-full border p-2 rounded h-32"
-        ></textarea>
+      <div className="bg-white p-6 rounded shadow space-y-4">
+        {/* First Name */}
+        <div>
+          <label className="block mb-1 font-semibold">First Name</label>
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        {/* Last Name */}
+        <div>
+          <label className="block mb-1 font-semibold">Last Name</label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        {/* Business Name */}
+        <div>
+          <label className="block mb-1 font-semibold">Business Name</label>
+          <input
+            type="text"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        {/* Story Heading */}
+        <div>
+          <label className="block mb-1 font-semibold">Story Heading</label>
+          <input
+            type="text"
+            value={storyHeading}
+            onChange={(e) => setStoryHeading(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        {/* Story */}
+        <div>
+          <label className="block mb-1 font-semibold">Your Story</label>
+          <textarea
+            value={story}
+            onChange={(e) => setStory(e.target.value)}
+            rows={5}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        {/* Save Button */}
+        <button
+          onClick={handleSave}
+          className="bg-dark-green text-white px-4 py-2 rounded hover:bg-dark-brown transition"
+        >
+          Save
+        </button>
+
+        {/* Back to Dashboard Button */}
+        <button
+          onClick={() => router.push(`/dashboard/seller/${acct_id}`)}
+          className="ml-4 border border-dark-brown px-4 py-2 rounded hover:bg-dark-brown hover:text-white transition"
+        >
+          Back to Dashboard
+        </button>
       </div>
     </section>
   );

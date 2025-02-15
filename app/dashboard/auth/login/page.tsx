@@ -4,106 +4,100 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [userEmail, setUserEmail] = useState("");
-  const [userPassword, setUserPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setError("");
 
-    // Retrieve stored credentials from localStorage
-    const storedEmail = localStorage.getItem("userEmail");
-    const storedPassword = localStorage.getItem("userPassword");
-    const storedUserType = localStorage.getItem("userType"); // e.g., "Seller" or "Customer"
-    const storedAcctId = localStorage.getItem("acct_id");    // The seller's unique ID
+    try {
+      // POST to our /api/auth/login route
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Login failed");
+        return;
+      }
 
-    if (!storedEmail || !storedPassword || !storedUserType) {
-      setError("Account not found. Please sign up.");
-      return;
-    }
+      // data => { message, acct_id, account_type }
+      alert("Login successful!");
 
-    // Check if userEmail matches storedEmail
-    if (userEmail !== storedEmail) {
-      setError("Account not found. Please sign up.");
-      return;
-    }
+      // Set localStorage so user stays logged in
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("acct_id", data.acct_id);
 
-    // Check if password matches
-    if (userPassword !== storedPassword) {
-      setError("Incorrect password. Please try again.");
-      return;
-    }
-
-    // If we get here, credentials match
-    alert("Login successful! Redirecting...");
-    localStorage.setItem("isLoggedIn", "true");
-
-    setTimeout(() => {
-      if (storedUserType === "Seller" && storedAcctId) {
-        // If user is a seller, push them to their seller dashboard
-        router.push(`/dashboard/seller/${storedAcctId}`);
+      if (data.account_type === "Seller") {
+        router.push(`/dashboard/seller/${data.acct_id}`);
       } else {
-        // If user is a customer (or no acct_id), push them to /dashboard
         router.push("/dashboard");
       }
-    }, 1000);
-  };
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Something went wrong during login.");
+    }
+  }
 
   return (
     <section className="container mx-auto px-4 py-10 flex justify-center items-center">
       <div className="w-full max-w-md bg-white border border-dark-brown/20 rounded p-6 shadow-sm">
-        <h1 className="text-2xl font-bold mb-4 font-serif text-dark-brown">Login</h1>
+        <h1 className="text-2xl font-bold mb-4 font-serif text-dark-brown">
+          Login
+        </h1>
+
         <form className="space-y-4" onSubmit={handleLogin}>
-          {/* Email Field */}
+          {/* Email */}
           <div>
-            <label htmlFor="email" className="block mb-1 font-medium text-dark-brown">
-              Email
-            </label>
+            <label className="block mb-1 font-medium text-dark-brown">Email</label>
             <input
               type="email"
-              id="email"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
+              className="w-full border border-dark-brown/20 px-3 py-2 rounded
+                         focus:outline-none focus:ring-2 focus:ring-dark-green"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green"
-              placeholder="email@example.com"
             />
           </div>
 
-          {/* Password Field */}
+          {/* Password */}
           <div>
-            <label htmlFor="password" className="block mb-1 font-medium text-dark-brown">
-              Password
-            </label>
+            <label className="block mb-1 font-medium text-dark-brown">Password</label>
             <input
               type="password"
-              id="password"
-              value={userPassword}
-              onChange={(e) => setUserPassword(e.target.value)}
+              className="w-full border border-dark-brown/20 px-3 py-2 rounded
+                         focus:outline-none focus:ring-2 focus:ring-dark-green"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green"
-              placeholder="Password"
             />
           </div>
 
-          {/* Error Message */}
+          {/* Error */}
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Sign In Button */}
+          {/* Submit */}
           <button
             type="submit"
-            className="bg-dark-brown text-cream w-full py-2 rounded hover:bg-light-brown hover:text-white transition-colors font-semibold"
+            className="bg-dark-brown text-cream w-full py-2 rounded
+                       hover:bg-light-brown hover:text-white transition-colors
+                       font-semibold"
           >
             Sign In
           </button>
         </form>
 
-        {/* Sign Up Link */}
         <div className="mt-4">
-          <a href="/dashboard/auth/signup" className="text-sm text-dark-brown/70 hover:underline">
-            Not a member? Register today.
+          <a
+            href="/dashboard/auth/signup"
+            className="text-sm text-dark-brown/70 hover:underline"
+          >
+            Need an account? Sign up here.
           </a>
         </div>
       </div>
