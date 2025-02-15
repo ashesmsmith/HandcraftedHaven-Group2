@@ -105,7 +105,7 @@ export default function SellerDashboard() {
         </Link>
 
         {/* Add New Listing */}
-        <Link href={`/dashboard/seller/${acct_id}/listings/add-listing`}>
+        <Link href={`/dashboard/seller/${acct_id}/add-listing`}>
           <div className="bg-dark-brown text-white p-6 rounded-lg shadow-md cursor-pointer hover:bg-light-brown hover:text-dark-brown transition">
             <h2 className="text-xl font-semibold">➕ Add Listing</h2>
             <p className="text-sm">Create a new product listing for sale.</p>
