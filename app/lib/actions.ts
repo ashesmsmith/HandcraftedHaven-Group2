@@ -15,7 +15,7 @@ const AddListingFormSchema = z.object({
     imageSRC: z.string(),
 });
 
-export async function addListing(formData: FormData) {
+export async function addListing(formData: FormData): Promise<void> {
     const parsedData = AddListingFormSchema.parse({
         account_id: formData.get('account_id') as string,
         productName: formData.get('productName') as string,
@@ -35,7 +35,6 @@ export async function addListing(formData: FormData) {
         `;
     } catch (error) {
         console.log(`Error with lib/actions - addListing: ${error}`)
-        return {message: 'An error occurred while adding the listing.'}
     }
 
     revalidatePath(`/dashboard/seller/${account_id}`);
@@ -53,7 +52,7 @@ const EditListingFormSchema = z.object({
     imageSRC: z.string(),
 })
 
-export async function editListing(formData: FormData) {
+export async function editListing(formData: FormData): Promise<void> {
     const parsedData = EditListingFormSchema.parse({
         product_id: formData.get('product_id') as string,
         account_id: formData.get('account_id') as string,
@@ -75,7 +74,6 @@ export async function editListing(formData: FormData) {
         `;
     } catch (error) {
         console.log(`Error with lib/actions - editListing: ${error}`)
-        return {message: 'An error occurred while updating the listing.'}
     }
 
     revalidatePath(`/dashboard/seller/${account_id}`);

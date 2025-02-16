@@ -23,7 +23,7 @@ export type ProductsTable = {
     productDesc: string;
     category: 'Pottery' | 'Clothing' |  'Jewelry' |  'Stickers' |  'Woodworking' |  'Other'
     color: 'Black' |  'White' |  'Gray' |  'Brown' |  'Red' |  'Orange' |  'Yellow' |  'Green' |  'Blue' |  'Purple' |  'Pink' |  'Multi'
-    price: number;
+    price: string;
     imageSRC: string;
 }
 
