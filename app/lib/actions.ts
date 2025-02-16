@@ -53,7 +53,7 @@ export async function addListing(formData: FormData) {
 
     try {
         await sql`
-            INSERT INTO products (account_id, productName, productDesc, category, color, price, imageSRC)
+            INSERT INTO products (account_id, "productName", "productDesc", category, color, price, "imageSRC")
             VALUES (${account_id}, ${productName}, ${productDesc}, ${category}, ${color}, ${price}, ${imageSRC})
         `;
     } catch (error) {
@@ -93,7 +93,7 @@ export async function editListing(formData: FormData) {
     try {
         await sql`
             UPDATE products
-            SET productName = ${productName}, productDesc = ${productDesc}, category = ${category}, color = ${color}, price = ${price}, imageSRC = ${imageSRC}
+            SET "productName" = ${productName}, "productDesc" = ${productDesc}, category = ${category}, color = ${color}, price = ${price}, "imageSRC" = ${imageSRC}
             WHERE product_id = ${product_id} AND account_id = ${account_id}
         `;
     } catch (error) {
