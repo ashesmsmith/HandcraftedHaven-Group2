@@ -5,7 +5,7 @@ import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-// ✅ Schema for Adding & Editing Listings
+// Schema for Adding & Editing Listings
 const ListingSchema = z.object({
   product_id: z.string().optional(), // Not required for adding new products
   account_id: z.string(),
@@ -38,7 +38,7 @@ const ListingSchema = z.object({
 });
 
 /** 
- * 🔹 Fetch a product by ID
+ * Fetch a product by ID
  */
 export async function fetchProductById(product_id: string) {
   try {
@@ -52,20 +52,20 @@ export async function fetchProductById(product_id: string) {
     `;
 
     if (result.rows.length === 0) {
-      console.warn(`⚠️ Product with ID ${product_id} not found.`);
+      console.warn(`Product with ID ${product_id} not found.`);
       return null;
     }
 
-    console.log(`✅ Found product:`, result.rows[0]);
+    console.log(`Found product:`, result.rows[0]);
     return result.rows[0];
   } catch (error) {
-    console.error("❌ Error fetching product:", error);
+    console.error("Error fetching product:", error);
     return null;
   }
 }
 
 /** 
- * 🔹 Add a new listing
+ * Add a new listing
  */
 export async function addListing(formData: FormData) {
   try {
@@ -82,19 +82,19 @@ export async function addListing(formData: FormData) {
     const { account_id, productName, productDesc, category, color, price, imageSRC } = parsedData;
     const newProductId = crypto.randomUUID(); // Generate a new UUID
 
-    console.log(`🆕 Adding new product with ID: ${newProductId}`);
+    console.log(`Adding new product with ID: ${newProductId}`);
 
     await sql`
       INSERT INTO products (product_id, account_id, "productName", "productDesc", category, color, price, "imageSRC")
       VALUES (${newProductId}, ${account_id}, ${productName}, ${productDesc}, ${category}, ${color}, ${price}, ${imageSRC})
     `;
 
-    console.log("✅ Product added successfully");
+    console.log("Product added successfully");
 
     revalidatePath(`/dashboard/seller/${account_id}/listings`);
     redirect(`/dashboard/seller/${account_id}/listings`);
   } catch (error) {
-    console.error("❌ Error with addListing:", error);
+    console.error("Error with addListing:", error);
     return { message: "An error occurred while adding the listing." };
   }
 }
@@ -119,7 +119,7 @@ export async function editListing(formData: FormData) {
 
     const { product_id, account_id, productName, productDesc, category, color, price, imageSRC } = parsedData;
 
-    console.log(`✏️ Updating product ID: ${product_id} for account: ${account_id}`);
+    console.log(`Updating product ID: ${product_id} for account: ${account_id}`);
 
     const result = await sql`
       UPDATE products
@@ -129,47 +129,47 @@ export async function editListing(formData: FormData) {
     `;
 
     if (result.rowCount === 0) {
-      throw new Error(`⚠️ No rows updated. Verify that product_id ${product_id} exists and belongs to account_id ${account_id}.`);
+      throw new Error(`No rows updated. Verify that product_id ${product_id} exists and belongs to account_id ${account_id}.`);
     }
 
-    console.log("✅ Product updated successfully:", result.rows[0]);
+    console.log("Product updated successfully:", result.rows[0]);
 
     revalidatePath(`/dashboard/seller/${account_id}/listings`);
     redirect(`/dashboard/seller/${account_id}/listings`);
   } catch (error) {
-    console.error("❌ Error in editListing:", error);
+    console.error("Error in editListing:", error);
     return { message: "An error occurred while updating the listing." };
   }
 }
 
 /** 
- * 🔹 Delete a listing
+ * Delete a listing
  */
 export async function deleteListing(prod_id: string, acct_id: string) {
   try {
-    console.log(`🗑️ Deleting product ID: ${prod_id}`);
+    console.log(`Deleting product ID: ${prod_id}`);
 
     const result = await sql`
       DELETE FROM products WHERE product_id = ${prod_id} AND account_id = ${acct_id}
     `;
 
     if (result.rowCount === 0) {
-      console.warn(`⚠️ No rows deleted. Verify product ID ${prod_id} exists and belongs to account ID ${acct_id}.`);
+      console.warn(`No rows deleted. Verify product ID ${prod_id} exists and belongs to account ID ${acct_id}.`);
       return { message: "No product found to delete." };
     }
 
-    console.log(`✅ Deleted product ID: ${prod_id}`);
+    console.log(`Deleted product ID: ${prod_id}`);
 
     revalidatePath(`/dashboard/seller/${acct_id}/listings`);
     redirect(`/dashboard/seller/${acct_id}/listings`);
   } catch (error) {
-    console.error("❌ Error with deleteListing:", error);
+    console.error("Error with deleteListing:", error);
     return { message: "An error occurred while deleting the listing." };
   }
 }
 
 /** 
- * 🔹 Fetch all products for a seller
+ * Fetch all products for a seller
  */
 export async function fetchProductsBySeller(account_id: string) {
   try {
@@ -181,10 +181,10 @@ export async function fetchProductsBySeller(account_id: string) {
       WHERE account_id = ${account_id}
     `;
 
-    console.log(`✅ Found ${result.rows.length} products for seller ${account_id}`);
+    console.log(`Found ${result.rows.length} products for seller ${account_id}`);
     return result.rows;
   } catch (error) {
-    console.error("❌ Error fetching seller's products:", error);
+    console.error("Error fetching seller's products:", error);
     return [];
   }
 }

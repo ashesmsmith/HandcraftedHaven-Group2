@@ -40,11 +40,11 @@ export default function EditListingPage() {
     formData.append("product_id", prod_id);
 
     try {
-      console.log("🔄 Submitting edit form...");
+      console.log("Submitting edit form...");
       await editListing(formData);
       router.push(`/dashboard/seller/${acct_id}/listings`);
     } catch (error) {
-      console.error("❌ Failed to update listing:", error);
+      console.error("Failed to update listing:", error);
       setStatusMsg("Failed to update listing.");
     }
   }
@@ -52,11 +52,11 @@ export default function EditListingPage() {
   async function handleDelete() {
     if (!confirm("Are you sure you want to delete this listing?")) return;
     try {
-      console.log(`🗑️ Deleting product ID: ${prod_id}`);
+      console.log(`Deleting product ID: ${prod_id}`);
       await deleteListing(prod_id, acct_id);
       router.push(`/dashboard/seller/${acct_id}/listings`);
     } catch (error) {
-      console.error("❌ Error deleting listing:", error);
+      console.error("Error deleting listing:", error);
       setStatusMsg("Error deleting listing.");
     }
   }

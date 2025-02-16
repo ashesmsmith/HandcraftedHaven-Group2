@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ProductImage from "@/ui/product/product-image";
 import ProductDetails from "@/ui/product/product-details";
-import { fetchProductById } from "@/lib/actions"; // Ensure this function fetches from the DB
+import { fetchProductById } from "@/lib/actions";
 import { cormorant, montserrat } from "@/ui/fonts";
 
 // Ensure Next.js doesn't try static typed routes:
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ProductDetailPage({ params }: { params: { id?: string } }) {
   if (!params.id) {
-    console.error("🚨 Missing product ID in params");
+    console.error("Missing product ID in params");
     return notFound();
   }
 
@@ -20,11 +20,11 @@ export default async function ProductDetailPage({ params }: { params: { id?: str
   try {
     product = await fetchProductById(params.id);
     if (!product) {
-      console.error("🚨 Product not found:", params.id);
+      console.error("Product not found:", params.id);
       return notFound();
     }
   } catch (error) {
-    console.error("❌ Failed to fetch product:", error);
+    console.error("Failed to fetch product:", error);
     return notFound();
   }
 
@@ -41,7 +41,7 @@ export default async function ProductDetailPage({ params }: { params: { id?: str
           <ProductDetails
             product={{
               name: product.productName,
-              price: Number(product.price), // Ensure price is a number
+              price: Number(product.price), 
               description: product.productDesc,
             }}
           />
