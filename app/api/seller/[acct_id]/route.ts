@@ -1,29 +1,29 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { fetchSellerAccountById } from "@/app/lib/data"; // or your actual path
-
-
-type SellerRouteContext = {
-  params: Promise<{ acct_id: string }>;
-};
+import { fetchSellerAccountById } from "@/lib/data"; // Ensure this file exists at app/lib/data.ts
 
 export async function GET(
-  _req: NextRequest,
-  { params }: SellerRouteContext
+  request: Request,
+  { params }: { params: { acct_id: string } }
 ) {
-  const { acct_id } = await params;
-
   try {
-    // If fetchSellerAccountById returns an array or null
-    const sellerData = await fetchSellerAccountById(acct_id);
-    if (!sellerData || sellerData.length === 0) {
+    if (!params.acct_id) {
+      return NextResponse.json({ error: "Seller ID is required" }, { status: 400 });
+    }
+
+    // fetchSellerAccountById returns an array of rows
+    const sellers = await fetchSellerAccountById(params.acct_id);
+    const seller = Array.isArray(sellers) ? sellers[0] : sellers;
+
+    if (!seller) {
       return NextResponse.json({ error: "Seller not found" }, { status: 404 });
     }
 
-    // Return the first row
-    return NextResponse.json(sellerData[0], { status: 200 });
-  } catch (error) {
-    console.error("GET /api/seller/[acct_id] error:", error);
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    return NextResponse.json(seller);
+  } catch (error: unknown) {
+    console.error("Error fetching seller:", error);
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: "Failed to fetch seller" }, { status: 500 });
   }
 }

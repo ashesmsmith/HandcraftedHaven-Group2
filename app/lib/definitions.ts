@@ -44,3 +44,10 @@ export type OrderProductsTable = {
     quantity: number;
     total: number;
 }
+export type Review = {
+    product_id: string;
+    account_id: string;
+    stars: number;
+    review: string;
+    date: string;
+};

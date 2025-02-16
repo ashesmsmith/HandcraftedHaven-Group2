@@ -1,80 +1,47 @@
+// app/api/seller/[acct_id]/profile/route.ts
 import { NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
 
-type ProfileRouteContext = {
-  params: Promise<{ acct_id: string }>;
-};
-
-export async function PUT(request: Request, { params }: ProfileRouteContext) {
-  // Await the dynamic params
-  const { acct_id } = await params;
-
+export async function PUT(
+  request: Request,
+  { params }: { params: { acct_id: string } }
+) {
+  const { acct_id } = params;
   try {
-    if (!acct_id) {
-      return NextResponse.json({ error: "Missing account ID." }, { status: 400 });
-    }
-
     const body = await request.json();
     const { firstName, lastName, businessName, story_heading, story, image } = body;
+    
+    console.log("Updating seller profile for acct_id:", acct_id, body);
 
-    // Validate required fields 
-    if (!firstName || !lastName || !businessName || !story_heading || !story) {
-      return NextResponse.json(
-        { error: "Required fields are missing." },
-        { status: 400 }
-      );
-    }
-
-    console.log("Updating seller profile for:", acct_id);
-    console.log("Data received:", body);
-
-    // Determine the image URL (if none provided, use default)
-    const imageURL =
-      image && image.trim() !== "" ? image : "/default_profile.webp";
-
-    // Begin manual transaction
-    await sql`BEGIN`;
-
-    // Update accounts table
-    await sql`
+    // Note the quoted column names for accounts
+    const accountsResult = await sql`
       UPDATE accounts
-      SET
-        firstname    = ${firstName},
-        lastname     = ${lastName},
-        businessname = ${businessName}
-      WHERE account_id = ${acct_id};
-    `;
-
-    // Update seller_profiles table
-    const result = await sql`
-      UPDATE seller_profiles
-      SET
-        story_heading = ${story_heading},
-        story         = ${story},
-        image         = ${imageURL}
+      SET "firstName" = ${firstName},
+          "lastName" = ${lastName},
+          "businessName" = ${businessName}
       WHERE account_id = ${acct_id}
-      RETURNING *;
     `;
+    console.log("Accounts update result:", accountsResult.rowCount);
 
-    if (result.rowCount === 0) {
-      await sql`ROLLBACK`;
-      return NextResponse.json(
-        { error: "No matching seller profile found." },
-        { status: 404 }
-      );
+    // Update the seller_profiles table (assuming these columns are stored in lowercase)
+    const profilesResult = await sql`
+      UPDATE seller_profiles
+      SET story_heading = ${story_heading},
+          story = ${story},
+          image = ${image}
+      WHERE account_id = ${acct_id}
+    `;
+    console.log("Seller profiles update result:", profilesResult.rowCount);
+
+    if (accountsResult.rowCount === 0 || profilesResult.rowCount === 0) {
+      throw new Error("No rows were updated. Verify the account exists and data is correct.");
     }
 
-    await sql`COMMIT`;
-
-    return NextResponse.json(
-      { message: "Profile updated successfully!" },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error updating seller profile:", error);
-    await sql`ROLLBACK`;
     return NextResponse.json(
-      { error: "Update failed. Please try again." },
+      { error: error instanceof Error ? error.message : "Update failed. Please try again." },
       { status: 500 }
     );
   }

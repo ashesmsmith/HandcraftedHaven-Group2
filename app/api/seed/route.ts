@@ -2,12 +2,10 @@ import bcrypt from "bcrypt";
 import { db } from "@vercel/postgres";
 import {
   accounts,
-  seller_profiles,
   products,
   orders,
-  reviews,
   order_products,
-} from "@/app/lib/placeholder-data";
+} from "@/lib/placeholder-data"; // Removed seller_profiles import
 
 // Connect once (for this route)
 const client = await db.connect();
@@ -18,8 +16,6 @@ await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
  * CREATE TYPE acct_type AS ENUM ('Admin','Seller','Customer')
  */
 async function checkIfTypeExists(typeName: string, typeDefEscaped: string) {
-  // Example usage:
-  //  checkIfTypeExists("acct_type", "''Admin'',''Seller'',''Customer''");
   const sql = `
     DO $$
     BEGIN
@@ -87,50 +83,11 @@ async function seedAccounts() {
   return insertedAccounts;
 }
 
-async function seedSellerProfiles() {
-  await client.sql`
-    CREATE TABLE IF NOT EXISTS seller_profiles (
-      profile_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      account_id UUID NOT NULL,
-      story_heading VARCHAR(255),
-      story TEXT NOT NULL,
-      image TEXT NOT NULL DEFAULT '/default_profile.webp',
-      FOREIGN KEY (account_id) REFERENCES accounts(account_id)
-    );
-  `;
-
-  const insertedSellerProfiles = await Promise.all(
-    seller_profiles.map((profile) =>
-      client.sql`
-        INSERT INTO seller_profiles (
-          profile_id,
-          account_id,
-          story_heading,
-          story,
-          image
-        )
-        VALUES (
-          ${profile.profile_id},
-          ${profile.account_id},
-          ${profile.story_heading},
-          ${profile.story},
-          ${profile.image}
-        )
-        ON CONFLICT (profile_id) DO NOTHING;
-      `
-    )
-  );
-
-  return insertedSellerProfiles;
-}
-
 async function seedProducts() {
-  // Double-escape for category_type
   await checkIfTypeExists(
     "category_type",
     "''Pottery'',''Clothing'',''Jewelry'',''Stickers'',''Woodworking'',''Other''"
   );
-  // Double-escape for color_type
   await checkIfTypeExists(
     "color_type",
     "''Black'',''White'',''Gray'',''Brown'',''Red'',''Orange'',''Yellow'',''Green'',''Blue'',''Purple'',''Pink'',''Multi''"
@@ -182,7 +139,6 @@ async function seedProducts() {
 }
 
 async function seedOrders() {
-  // Double-escape for status_type
   await checkIfTypeExists("status_type", "''Processed'',''Shipped'',''Canceled''");
 
   await client.sql`
@@ -266,69 +222,10 @@ async function seedOrder_Products() {
   return insertedOrder_Products;
 }
 
-async function seedReviews() {
-  await client.sql`
-    CREATE TABLE IF NOT EXISTS reviews (
-      product_id UUID NOT NULL,
-      account_id UUID NOT NULL,
-      stars INT NOT NULL,
-      review TEXT,
-      date DATE NOT NULL,
-      PRIMARY KEY (product_id, account_id),
-      FOREIGN KEY (product_id) REFERENCES products(product_id),
-      FOREIGN KEY (account_id) REFERENCES accounts(account_id)
-    );
-  `;
+// Call all seeding functions sequentially
+await seedAccounts();
+await seedProducts();
+await seedOrders();
+await seedOrder_Products();
 
-  const insertedReviews = await Promise.all(
-    reviews.map((r) =>
-      client.sql`
-        INSERT INTO reviews (
-          product_id,
-          account_id,
-          stars,
-          review,
-          date
-        )
-        VALUES (
-          ${r.product_id},
-          ${r.account_id},
-          ${r.stars},
-          ${r.review},
-          ${r.date}::DATE
-        )
-        ON CONFLICT (product_id, account_id) DO NOTHING;
-      `
-    )
-  );
 
-  return insertedReviews;
-}
-
-/**
- * GET /api/seed
- */
-export async function GET() {
-  try {
-    await client.sql`BEGIN`;
-    await seedAccounts();
-    await seedSellerProfiles();
-    await seedProducts();
-    await seedOrders();
-    await seedOrder_Products();
-    await seedReviews();
-    await client.sql`COMMIT`;
-
-    return new Response(
-      JSON.stringify({ message: "Database seeded successfully" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    console.error("Error Seeding Database: ", error);
-    await client.sql`ROLLBACK`;
-    return new Response(JSON.stringify({ error, status: 500 }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-}

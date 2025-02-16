@@ -1,3 +1,4 @@
+// app/dashboard/seller/[acct_id]/profile/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -27,9 +28,10 @@ export default function SellerProfileEditablePage() {
         const sellerData = await res.json();
         console.log("🔍 Loaded Seller Data:", sellerData);
 
-        setFirstName(sellerData.firstname || "");
-        setLastName(sellerData.lastname || "");
-        setBusinessName(sellerData.businessname || "");
+        // Use the camelCase keys returned by the API
+        setFirstName(sellerData.firstName || "");
+        setLastName(sellerData.lastName || "");
+        setBusinessName(sellerData.businessName || "");
         setStoryHeading(sellerData.story_heading || "");
         setStory(sellerData.story || "");
         setImage(sellerData.image || "/default_profile.webp");
@@ -146,7 +148,7 @@ export default function SellerProfileEditablePage() {
           />
         </div>
 
-        {/* New: Profile Picture URL */}
+        {/* Profile Picture URL */}
         <div>
           <label className="block mb-1 font-semibold">Profile Picture URL</label>
           <input
