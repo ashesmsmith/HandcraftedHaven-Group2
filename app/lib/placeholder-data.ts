@@ -221,4 +221,4 @@ const reviews = [
     },
 ];
 
-export { accounts, products, orders, order_products, reviews };
+export { accounts, seller_profiles, products, orders, order_products, reviews };

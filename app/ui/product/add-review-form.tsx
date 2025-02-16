@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addReview } from "@/app/lib/action";
+import { addReview } from "@/app/lib/reviewAction";
 import type { Review } from "@/app/lib/definitions";
 
 export default function AddReviewForm({ 
@@ -11,40 +11,49 @@ export default function AddReviewForm({
     productId: string; 
     initialReviews: Review[]; 
 }) {
-    const [reviews, setReviews] = useState<Review[]>(initialReviews); // ✅ Ensures reviews is an array
+    const [reviews, setReviews] = useState<Review[]>(initialReviews);
     const [rating, setRating] = useState<number>(5);
     const [reviewText, setReviewText] = useState("");
-    const [submitting, setSubmitting] = useState(false);
+    const [submitting, setSubmitting] = useState(false); 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const handleSubmit = async (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setSubmitting(true);
-    
-        console.log("📝 Submitting review:", { productId, rating, reviewText });
-    
+        setErrorMessage(null);
+
+        // Create a FormData object
+        const formData = new FormData();
+        formData.append("product_id", productId);
+        formData.append("stars", rating.toString());
+        formData.append("review", reviewText.trim());
+
         try {
-            const newReview = await addReview(productId, rating, reviewText);
-    
-            if (newReview !== null) { 
-                setReviews((prevReviews) => [...prevReviews, newReview]); 
-                setReviewText("");
+            const response = await addReview(null, formData); //  Correct Server Action call
+            console.log(" Response from addReview:", response);
+
+            if (response.success && response.review !== undefined) {
+                setReviews((prevReviews) => [...prevReviews, response.review as Review]); // ✅ Fixes TypeScript error
+                setReviewText(""); // Reset form
                 setRating(5);
-                console.log("✅ Review successfully added:", newReview);
+            } else if (response.errors) {
+                setErrorMessage(" " + Object.values(response.errors).flat().join(", "));
             } else {
-                console.error("❌ Failed to add review. Review returned null.");
+                setErrorMessage(" Something went wrong. Please try again.");
             }
         } catch (error) {
-            console.error("❌ Error while submitting review:", error);
+            console.error(" Error while submitting review:", error);
+            setErrorMessage("Failed to submit review. Please try again.");
+        } finally {
+            setSubmitting(false);
         }
-    
-        setSubmitting(false);
     };
-    
-    
 
     return (
         <div className="mt-6 p-4 border rounded-md shadow-md">
             <h3 className="text-lg font-bold mb-2">Write a Review</h3>
+
+            {errorMessage && <p className="text-red-600 mb-2">{errorMessage}</p>}
 
             <form onSubmit={handleSubmit}>
                 <label className="block text-sm font-medium">Rating:</label>
@@ -72,11 +81,27 @@ export default function AddReviewForm({
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#8A5D3D] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
+                    className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#8A5D3D]"
                 >
                     {submitting ? "Submitting..." : "Submit Review"}
                 </button>
             </form>
+
+            {/* Display Submitted Reviews Below */}
+            <h3 className="text-lg font-bold mt-6">Reviews</h3>
+            {reviews.length === 0 ? (
+                <p className="text-gray-500">No reviews yet. Be the first to review!</p>
+            ) : (
+                <ul className="mt-2">
+                    {reviews.map((r, index) => (
+                        <li key={index} className="border p-2 rounded my-2">
+                            <p className="font-semibold">{r.stars} ⭐</p>
+                            <p>{r.review}</p>
+                            <p className="text-sm text-gray-500">Reviewed on {new Date(r.date).toLocaleDateString()}</p>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }
