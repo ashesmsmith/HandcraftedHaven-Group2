@@ -4,10 +4,20 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { editListing, deleteListing } from "@/lib/actions";
 
+interface Product {
+  product_id: string;
+  productName: string;
+  productDesc: string;
+  category: string;
+  color: string;
+  price: number;
+  imageSRC: string;
+}
+
 export default function EditListingPage() {
   const { acct_id, prod_id } = useParams() as { acct_id: string; prod_id: string };
   const router = useRouter();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusMsg, setStatusMsg] = useState("");
 
@@ -16,12 +26,9 @@ export default function EditListingPage() {
       try {
         console.log(`🔍 Fetching product details for ID: ${prod_id}`);
         const res = await fetch(`/api/products/${prod_id}`);
-        if (!res.ok) {
-          throw new Error(`Failed to fetch product: ${await res.text()}`);
-        }
+        if (!res.ok) throw new Error(`Failed to fetch product: ${await res.text()}`);
         const data = await res.json();
-        setProduct(data.product); // Ensure it gets the `product` object from API response
-        console.log("✅ Product loaded:", data.product);
+        setProduct(data.product);
       } catch (error) {
         console.error("❌ Error loading product:", error);
         setStatusMsg("Error loading product details.");
@@ -66,109 +73,53 @@ export default function EditListingPage() {
   return (
     <section className="container mx-auto px-6 py-10">
       <h1 className="text-3xl font-bold mb-4">Edit Product</h1>
-
       {statusMsg && <div className="text-red-600">{statusMsg}</div>}
 
       <form onSubmit={handleSave} className="space-y-4 bg-white p-6 rounded shadow">
-        {/* Hidden Fields */}
         <input type="hidden" name="product_id" value={prod_id} />
         <input type="hidden" name="account_id" value={acct_id} />
 
-        {/* Product Name */}
         <div>
           <label className="block mb-1 font-semibold">Product Name</label>
-          <input
-            type="text"
-            name="productName"
-            defaultValue={product.productName}
-            className="w-full border p-2 rounded"
-            required
-          />
+          <input type="text" name="productName" defaultValue={product.productName} className="w-full border p-2 rounded" required />
         </div>
 
-        {/* Description */}
         <div>
           <label className="block mb-1 font-semibold">Product Description</label>
-          <textarea
-            name="productDesc"
-            defaultValue={product.productDesc}
-            className="w-full border p-2 rounded"
-            required
-          />
+          <textarea name="productDesc" defaultValue={product.productDesc} className="w-full border p-2 rounded" required />
         </div>
 
-        {/* Category */}
         <div>
           <label className="block mb-1 font-semibold">Category</label>
           <select name="category" defaultValue={product.category} className="w-full border p-2 rounded">
-            <option value="Pottery">Pottery</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Jewelry">Jewelry</option>
-            <option value="Stickers">Stickers</option>
-            <option value="Woodworking">Woodworking</option>
-            <option value="Other">Other</option>
+            {["Pottery", "Clothing", "Jewelry", "Stickers", "Woodworking", "Other"].map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
         </div>
 
-        {/* Color */}
         <div>
           <label className="block mb-1 font-semibold">Color</label>
           <select name="color" defaultValue={product.color} className="w-full border p-2 rounded">
-            <option value="Black">Black</option>
-            <option value="White">White</option>
-            <option value="Gray">Gray</option>
-            <option value="Brown">Brown</option>
-            <option value="Red">Red</option>
-            <option value="Orange">Orange</option>
-            <option value="Yellow">Yellow</option>
-            <option value="Green">Green</option>
-            <option value="Blue">Blue</option>
-            <option value="Purple">Purple</option>
-            <option value="Pink">Pink</option>
-            <option value="Multi">Multi</option>
+            {["Black", "White", "Gray", "Brown", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink", "Multi"].map((color) => (
+              <option key={color} value={color}>{color}</option>
+            ))}
           </select>
         </div>
 
-        {/* Price */}
         <div>
           <label className="block mb-1 font-semibold">Price</label>
-          <input
-            type="number"
-            name="price"
-            step="0.01"
-            defaultValue={product.price}
-            className="w-full border p-2 rounded"
-            required
-          />
+          <input type="number" name="price" step="0.01" defaultValue={product.price} className="w-full border p-2 rounded" required />
         </div>
 
-        {/* Image URL */}
         <div>
           <label className="block mb-1 font-semibold">Image URL</label>
-          <input
-            type="text"
-            name="imageSRC"
-            defaultValue={product.imageSRC}
-            className="w-full border p-2 rounded"
-            required
-          />
+          <input type="text" name="imageSRC" defaultValue={product.imageSRC} className="w-full border p-2 rounded" required />
         </div>
 
-        {/* Buttons */}
         <div className="flex gap-4">
-          <button
-            type="submit"
-            className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition"
-          >
-            Save Changes
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition"
-          >
-            Delete Listing
-          </button>
+          <button type="submit" className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">Save Changes</button>
+          <button type="button" onClick={handleDelete} className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">Delete Listing</button>
         </div>
       </form>
     </section>
