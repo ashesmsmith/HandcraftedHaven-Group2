@@ -102,6 +102,7 @@ export default function AddListingForm() {
                         id="price" 
                         name="price" 
                         type="number" 
+                        step="0.01"
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
                     />
