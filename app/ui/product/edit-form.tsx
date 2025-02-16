@@ -89,6 +89,7 @@ export default function EditListingForm({ product, prod_id, acct_id }: { product
                         id="price" 
                         name="price" 
                         type="number" 
+                        step="0.01"
                         defaultValue={price}
                         className="w-full border border-dark-brown/20 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-dark-green" 
                         required
