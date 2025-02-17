@@ -43,6 +43,22 @@ export async function fetchProductById(product_id: string) {
   }
 }
 
+// Fetch products by Seller ID
+export async function fetchProductsBySellerId(account_id: string) {
+  try {
+    const data = await sql<ProductsTable>`
+      SELECT *
+      FROM products
+      WHERE account_id = ${account_id}
+    `;
+
+    return data.rows;
+  } catch (error) {
+    console.log("Error with fetchProductById: ", error);
+    throw error;
+  }
+}
+
 // Fetch an individual Order by ID
 export async function fetchOrderById(order_id: string) {
   try {

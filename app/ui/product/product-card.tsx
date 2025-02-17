@@ -9,7 +9,7 @@ export default function ProductCard({
     product_id: string;
     productName: string;
     productDesc: string;
-    price: number;
+    price: string;
     imageSRC: string;
   };
 }) {
@@ -26,7 +26,7 @@ export default function ProductCard({
       </div>
       <h2 className="text-lg font-bold">{product.productName}</h2>
       <p className="text-sm text-gray-600">{product.productDesc}</p>
-      <p className="text-md font-semibold">${product.price.toFixed(2)}</p>
+      <p className="text-md font-semibold">${parseInt(product.price).toFixed(2)}</p>
     </div>
   );
 }

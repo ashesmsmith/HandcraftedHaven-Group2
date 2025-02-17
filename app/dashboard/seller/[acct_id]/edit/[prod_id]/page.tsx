@@ -5,7 +5,6 @@
 import EditListingForm from '@/app/ui/product/edit-form';
 import { fetchProductById } from '@/app/lib/data';
 
-
 export default async function EditListingPage(props: { params: Promise<{ acct_id: string, prod_id: string }> }) {
     const params = await props.params;
     const acct_id = params.acct_id;
