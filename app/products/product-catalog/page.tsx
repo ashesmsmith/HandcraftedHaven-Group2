@@ -20,9 +20,6 @@ export default async function ProductCatalogPage(props: { searchParams?: Record<
 `;
 
 
-console.log("🔍 Sellers Data:", products.map(p => p.businessName)); // ✅ Debug output
-
-
 
 
   return <ProductCatalogClient products={products} searchParams={searchParams} />;
