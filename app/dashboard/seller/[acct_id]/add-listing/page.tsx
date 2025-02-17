@@ -7,29 +7,28 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function AddListingPage() {
-  const { acct_id } = useParams() as { acct_id: string };
+  const params = (useParams() ?? {}) as Record<string, string>;
+  const acct_id = params.acct_id ?? "";
+
   const [isPending, startTransition] = useTransition();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const placeholderImage = "/prod_images/no-image.png"; // Ensure this path is correct
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const placeholderImage = "/prod_images/no-image.png";
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Append the seller's account id
     formData.append("account_id", acct_id);
-
-    // Generate a valid UUID for the new product
-    const newProductId = crypto.randomUUID();
-    formData.append("product_id", newProductId);
+    formData.append("product_id", crypto.randomUUID());
 
     startTransition(async () => {
       await addListing(formData);
+      setIsSubmitted(true);
     });
   }
 
-  // Handle change in image URL input field
   const handleImageUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setImageUrl(event.target.value);
   };
@@ -38,19 +37,21 @@ export default function AddListingPage() {
     <main className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="w-full max-w-xl p-8 bg-white border border-gray-200 rounded shadow-lg">
         <h1 className="text-3xl font-bold mb-6 text-center">Add New Listing</h1>
+
+        {/* Success Message (Now Styled in Dark Brown) */}
+        {isSubmitted && (
+          <div className="mb-4 text-[#543A27] text-center font-medium">
+            Listing was successfully posted!
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Product Name */}
           <div>
             <label htmlFor="productName" className="block font-medium mb-1">
               Product Name
             </label>
-            <input
-              id="productName"
-              name="productName"
-              type="text"
-              required
-              className="w-full border rounded px-3 py-2"
-            />
+            <input id="productName" name="productName" type="text" required className="w-full border rounded px-3 py-2" />
           </div>
 
           {/* Product Description */}
@@ -58,12 +59,7 @@ export default function AddListingPage() {
             <label htmlFor="productDesc" className="block font-medium mb-1">
               Product Description
             </label>
-            <textarea
-              id="productDesc"
-              name="productDesc"
-              required
-              className="w-full border rounded px-3 py-2"
-            />
+            <textarea id="productDesc" name="productDesc" required className="w-full border rounded px-3 py-2" />
           </div>
 
           {/* Category */}
@@ -71,12 +67,7 @@ export default function AddListingPage() {
             <label htmlFor="category" className="block font-medium mb-1">
               Category
             </label>
-            <select
-              id="category"
-              name="category"
-              required
-              className="w-full border rounded px-3 py-2"
-            >
+            <select id="category" name="category" required className="w-full border rounded px-3 py-2">
               <option value="Pottery">Pottery</option>
               <option value="Clothing">Clothing</option>
               <option value="Jewelry">Jewelry</option>
@@ -91,12 +82,7 @@ export default function AddListingPage() {
             <label htmlFor="color" className="block font-medium mb-1">
               Color
             </label>
-            <select
-              id="color"
-              name="color"
-              required
-              className="w-full border rounded px-3 py-2"
-            >
+            <select id="color" name="color" required className="w-full border rounded px-3 py-2">
               <option value="Black">Black</option>
               <option value="White">White</option>
               <option value="Gray">Gray</option>
@@ -117,14 +103,7 @@ export default function AddListingPage() {
             <label htmlFor="price" className="block font-medium mb-1">
               Price
             </label>
-            <input
-              id="price"
-              name="price"
-              type="number"
-              step="0.01"
-              required
-              className="w-full border rounded px-3 py-2"
-            />
+            <input id="price" name="price" type="number" step="0.01" required className="w-full border rounded px-3 py-2" />
           </div>
 
           {/* Image URL Input */}
@@ -132,41 +111,35 @@ export default function AddListingPage() {
             <label htmlFor="imageSRC" className="block font-medium mb-1">
               Image URL
             </label>
-            <input
-              id="imageSRC"
-              name="imageSRC"
-              type="text"
-              value={imageUrl || ""}
-              onChange={handleImageUrlChange}
-              className="w-full border rounded px-3 py-2"
-            />
+            <input id="imageSRC" name="imageSRC" type="text" value={imageUrl || ""} onChange={handleImageUrlChange} className="w-full border rounded px-3 py-2" />
           </div>
 
-          {/* Image Preview */}
-          <div>
-            <h2>Image Preview</h2>
+          {/*Fixed Image Preview with Required width & height */}
+          <div className="text-center">
+            <h2 className="text-lg font-medium mb-2">Image Preview</h2>
             <Image
               src={imageUrl || placeholderImage}
               alt="Product Image Preview"
-              className="w-32 h-32 object-cover mt-2" // Smaller size for the preview
+              width={128}
+              height={128}
+              className="object-cover rounded shadow"
             />
           </div>
 
           {/* Buttons */}
           <div className="flex flex-col gap-4">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition"
-            >
+            <button type="submit" disabled={isPending} className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition">
               {isPending ? "Submitting..." : "Add Listing"}
             </button>
+            <Link href={`/dashboard/seller/${acct_id}`} passHref>
+              <button type="button" className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition">
+                Back to Dashboard
+              </button>
+            </Link>
+            {/* "Go Back to View/Edit Listings" Button*/}
             <Link href={`/dashboard/seller/${acct_id}/listings`} passHref>
-              <button
-                type="button"
-                className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition"
-              >
-                Back to Listings
+              <button type="button" className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition">
+                Go Back to View/Edit Listings
               </button>
             </Link>
           </div>

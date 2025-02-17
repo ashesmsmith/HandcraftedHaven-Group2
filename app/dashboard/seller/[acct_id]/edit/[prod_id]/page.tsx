@@ -138,7 +138,7 @@ export default function EditListingPage() {
           <button type="submit" className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
             Save Changes
           </button>
-          <button type="button" onClick={handleDelete} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+          <button type="button" onClick={handleDelete} className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
             Delete Listing
           </button>
         </div>
