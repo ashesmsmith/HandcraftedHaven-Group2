@@ -38,7 +38,7 @@ export default function AddListingPage() {
       <div className="w-full max-w-xl p-8 bg-white border border-gray-200 rounded shadow-lg">
         <h1 className="text-3xl font-bold mb-6 text-center">Add New Listing</h1>
 
-        {/* Success Message (Now Styled in Dark Brown) */}
+        {/* Success Message */}
         {isSubmitted && (
           <div className="mb-4 text-[#543A27] text-center font-medium">
             Listing was successfully posted!
@@ -114,7 +114,6 @@ export default function AddListingPage() {
             <input id="imageSRC" name="imageSRC" type="text" value={imageUrl || ""} onChange={handleImageUrlChange} className="w-full border rounded px-3 py-2" />
           </div>
 
-          {/*Fixed Image Preview with Required width & height */}
           <div className="text-center">
             <h2 className="text-lg font-medium mb-2">Image Preview</h2>
             <Image

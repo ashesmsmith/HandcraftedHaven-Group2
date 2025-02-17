@@ -25,7 +25,7 @@ export default function EditListingPage() {
   useEffect(() => {
     async function loadProduct() {
       try {
-        console.log(`🔍 Fetching product details for ID: ${prod_id}`);
+        console.log(`Fetching product details for ID: ${prod_id}`);
         const res = await fetch(`/api/products/${prod_id}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch product: ${await res.text()}`);

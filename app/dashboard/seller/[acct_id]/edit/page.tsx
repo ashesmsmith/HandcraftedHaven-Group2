@@ -14,9 +14,8 @@ interface Product {
 }
 
 export default function SellerListingsPage() {
-  // ✅ Fix: Ensure `params` is always an object
   const params = (useParams() ?? {}) as Record<string, string>;
-  const acct_id = params.acct_id ?? ""; // ✅ Prevents `null` errors
+  const acct_id = params.acct_id ?? "";
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,9 +36,9 @@ export default function SellerListingsPage() {
 
         const data = await res.json();
         setProducts(data.products);
-        console.log("✅ Products loaded:", data.products);
+        console.log("Products loaded:", data.products);
       } catch (error) {
-        console.error("❌ Error fetching products:", error);
+        console.error("Error fetching products:", error);
         setStatusMsg("Error loading product listings.");
       } finally {
         setLoading(false);
