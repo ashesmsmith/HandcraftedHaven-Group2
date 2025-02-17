@@ -9,37 +9,65 @@ export default function NavBar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [acctId, setAcctId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const [navKey, setNavKey] = useState(0);
   const router = useRouter();
-  const pathname = usePathname(); 
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const loggedInStatus = localStorage.getItem("isLoggedIn");
-    setIsLoggedIn(loggedInStatus === "true");
+  // Function to update login state
+  const updateAuthState = () => {
+    const loggedInStatus = localStorage.getItem("isLoggedIn") === "true";
     const storedAcctId = localStorage.getItem("acct_id");
-    if (storedAcctId) setAcctId(storedAcctId);
+    setIsLoggedIn(loggedInStatus);
+    setAcctId(storedAcctId);
+    setNavKey((prevKey) => prevKey + 1); 
+  };
+
+  // Function to update cart count
+  const updateCartCount = () => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    setCartItemCount(cart.length);
+  };
+
+  // Run once when the page loads and whenever storage updates
+  useEffect(() => {
+    updateAuthState();
+    updateCartCount();
+
+    // Listen for localStorage changes
+    const handleStorageChange = () => {
+      updateAuthState();
+      updateCartCount();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
+  // Login trigger
+  useEffect(() => {
+    const loginCheckInterval = setInterval(() => {
+      if (localStorage.getItem("isLoggedIn") === "true") {
+        updateAuthState();
+        clearInterval(loginCheckInterval);
+      }
+    }, 500);
+
+    return () => clearInterval(loginCheckInterval);
+  }, []);
+
+  // Logout Function
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("acct_id");
-    setIsLoggedIn(false);
-    setAcctId(null);
+    updateAuthState();
     router.push("/");
   };
 
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/products/product-catalog", label: "Product Catalog" },
-    isLoggedIn && acctId
-      ? { href: `/dashboard/seller/${acctId}`, label: "Dashboard" }
-      : null,
-    isLoggedIn
-      ? { href: "#", label: "Logout", onClick: handleLogout }
-      : { href: "/dashboard/auth/login", label: "Login" },
-  ].filter((link): link is { href: string; label: string; onClick?: () => void } => Boolean(link));
-
   return (
-    <header className="border-b border-dark-brown/20 bg-light-green">
+    <header className="border-b border-dark-brown/20 bg-light-green" key={navKey}>
       <div className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
@@ -49,28 +77,62 @@ export default function NavBar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          {navLinks.map((link) =>
-            link.href === "#" ? (
-              <button
-                key={link.label}
-                onClick={link.onClick}
-                className="bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
-              >
-                {link.label}
-              </button>
-            ) : (
-              <Link key={link.href} href={link.href}>
+          <Link href="/products/product-catalog">
+            <button
+              className={`py-2 px-4 rounded transition-colors ${
+                pathname === "/products/product-catalog"
+                  ? "bg-dark-brown text-white"
+                  : "bg-dark-green text-white hover:bg-dark-brown"
+              }`}
+            >
+              Product Catalog
+            </button>
+          </Link>
+
+          {/* Only Show Dashboard & Cart if Logged In */}
+          {isLoggedIn && acctId && (
+            <>
+              <Link href={`/dashboard/seller/${acctId}`}>
                 <button
                   className={`py-2 px-4 rounded transition-colors ${
-                    pathname === link.href
+                    pathname.startsWith(`/dashboard/seller/${acctId}`)
                       ? "bg-dark-brown text-white"
                       : "bg-dark-green text-white hover:bg-dark-brown"
                   }`}
                 >
-                  {link.label}
+                  Dashboard
                 </button>
               </Link>
-            )
+
+              <Link href="/cart">
+                <button
+                  className={`py-2 px-4 rounded transition-colors ${
+                    pathname === "/cart"
+                      ? "bg-dark-brown text-white"
+                      : "bg-dark-green text-white hover:bg-dark-brown"
+                  }`}
+                >
+                  🛒 Cart ({cartItemCount})
+                </button>
+              </Link>
+            </>
+          )}
+
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link href="/dashboard/auth/login">
+              <button
+                className="bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
+              >
+                Login
+              </button>
+            </Link>
           )}
         </nav>
 
@@ -94,32 +156,56 @@ export default function NavBar() {
       {menuOpen && (
         <nav className="md:hidden bg-light-green border-t border-dark-brown/20">
           <div className="container mx-auto flex flex-col space-y-2 py-4 px-6">
-            {navLinks.map((link) =>
-              link.href === "#" ? (
-                <button
-                  key={link.label}
-                  onClick={() => {
-                    setMenuOpen(false);
-                    link.onClick?.();
-                  }}
-                  className="w-full text-left bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
-                >
-                  {link.label}
-                </button>
-              ) : (
-                <Link key={link.href} href={link.href}>
+            <Link href="/products/product-catalog">
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="w-full text-left bg-dark-brown text-white py-2 px-4 rounded hover:bg-dark-green transition-colors"
+              >
+                Product Catalog
+              </button>
+            </Link>
+
+            {isLoggedIn && acctId && (
+              <>
+                <Link href={`/dashboard/seller/${acctId}`}>
                   <button
                     onClick={() => setMenuOpen(false)}
-                    className={`w-full text-left py-2 px-4 rounded transition-colors ${
-                      pathname === link.href
-                        ? "bg-dark-brown text-white"
-                        : "bg-dark-green text-white hover:bg-dark-brown"
-                    }`}
+                    className="w-full text-left bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
                   >
-                    {link.label}
+                    Dashboard
                   </button>
                 </Link>
-              )
+
+                <Link href="/cart">
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="w-full text-left bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
+                  >
+                    Cart ({cartItemCount})
+                  </button>
+                </Link>
+              </>
+            )}
+
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full text-left bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link href="/dashboard/auth/login">
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full text-left bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
+                >
+                  Login
+                </button>
+              </Link>
             )}
           </div>
         </nav>
