@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CategoryFilter from "@/app/ui/filters/category-filter";
 import PriceFilter from "@/app/ui/filters/price-filter";
 import SellerFilter from "@/app/ui/filters/seller-filter";
@@ -20,7 +20,6 @@ export type ProductWithSeller = {
   businessName: string | null;
 };
 
-// ✅ No need to await anything in a client component
 export default function ProductCatalogClient({
   products,
   searchParams,
@@ -41,6 +40,7 @@ export default function ProductCatalogClient({
   });
   const [selectedSeller, setSelectedSeller] = useState<string | null>(searchParams?.seller || null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(searchParams?.sort || null);
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   // 🔍 Ensure price is a number
   const formattedProducts = products.map((product) => ({
@@ -69,6 +69,40 @@ export default function ProductCatalogClient({
     setSortOrder(null);
   };
 
+  // Handle Add to Cart logic
+  const handleAddToCart = (productId: string) => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const existingProductIndex = cart.findIndex(
+      (item: { productId: string }) => item.productId === productId
+    );
+
+    if (existingProductIndex === -1) {
+      cart.push({ productId, quantity: 1 }); // Add new product to the cart
+    } else {
+      cart[existingProductIndex].quantity += 1; // Update quantity if product exists
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart)); // Save to localStorage
+    setCartItemCount(cart.length); // Update cart item count
+  };
+
+  // Update cart item count from localStorage on load or when it changes
+  useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    setCartItemCount(cart.length);
+
+    const handleStorageChange = () => {
+      const updatedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      setCartItemCount(updatedCart.length);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col md:flex-row md:space-x-6 p-4">
       {/* Filters Section */}
@@ -81,22 +115,20 @@ export default function ProductCatalogClient({
           onFilterChange={setSelectedCategory}
         />
 
-
-      {/* Seller Filter */}
-      <SellerFilter
-        sellers={[
-          ...new Map(
-            products
-              .filter((p) => p.businessName && p.businessName.trim() !== "") // ✅ Exclude NULL and empty values
-              .map((p) => [
-                p.account_id,
-                { account_id: p.account_id, businessName: p.businessName! },
-              ])
-          ).values(),
-        ] as { account_id: string; businessName: string }[]} // ✅ Ensure correct type
-        onFilterChange={setSelectedSeller}
-      />
-
+        {/* Seller Filter */}
+        <SellerFilter
+          sellers={[
+            ...new Map(
+              products
+                .filter((p) => p.businessName && p.businessName.trim() !== "") // Exclude NULL and empty values
+                .map((p) => [
+                  p.account_id,
+                  { account_id: p.account_id, businessName: p.businessName! },
+                ])
+            ).values(),
+          ] as { account_id: string; businessName: string }[]}
+          onFilterChange={setSelectedSeller}
+        />
 
         {/* Price Filter */}
         <div className="mt-6">
@@ -115,9 +147,11 @@ export default function ProductCatalogClient({
       {/* Product Grid Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
         {filteredProducts.map((product) => (
-          <Link href={`/products/${product.product_id}`} key={product.product_id}>
-            <ProductCard product={product} />
-          </Link>
+          <ProductCard
+            key={product.product_id}
+            product={product}
+            onAddToCart={handleAddToCart} // Pass the function as a prop
+          />
         ))}
       </div>
     </div>
