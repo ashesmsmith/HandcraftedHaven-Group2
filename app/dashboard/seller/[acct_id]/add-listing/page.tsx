@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { addListing } from "@/lib/actions";
 import { useTransition, FormEvent, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function AddListingPage() {
@@ -144,7 +145,7 @@ export default function AddListingPage() {
           {/* Image Preview */}
           <div>
             <h2>Image Preview</h2>
-            <img
+            <Image
               src={imageUrl || placeholderImage}
               alt="Product Image Preview"
               className="w-32 h-32 object-cover mt-2" // Smaller size for the preview

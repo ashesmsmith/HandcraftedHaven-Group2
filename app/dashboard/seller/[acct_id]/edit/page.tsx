@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { editListing } from "@/lib/actions";
+import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface Product {
@@ -10,112 +9,78 @@ interface Product {
   productName: string;
   productDesc: string;
   category: string;
-  color: string;
   price: number;
   imageSRC: string;
 }
 
-export default function EditListingPage() {
-  const { acct_id, prod_id } = useParams<{ acct_id: string; prod_id: string }>();
-  const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
+export default function SellerListingsPage() {
+  // ✅ Fix: Ensure `params` is always an object
+  const params = (useParams() ?? {}) as Record<string, string>;
+  const acct_id = params.acct_id ?? ""; // ✅ Prevents `null` errors
+
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusMsg, setStatusMsg] = useState("");
 
   useEffect(() => {
-    async function loadProduct() {
+    async function fetchProducts() {
+      if (!acct_id) {
+        setStatusMsg("Invalid account ID.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        console.log(`🔍 Fetching product details for ID: ${prod_id}`);
-        const res = await fetch(`/api/products/${prod_id}`);
-        if (!res.ok) {
-          throw new Error(`Failed to fetch product: ${await res.text()}`);
-        }
+        console.log("Fetching products for account:", acct_id);
+        const res = await fetch(`/api/seller/${acct_id}/products`);
+        if (!res.ok) throw new Error("Failed to fetch products.");
+
         const data = await res.json();
-        setProduct(data.product);
-        console.log("Product loaded:", data.product);
+        setProducts(data.products);
+        console.log("✅ Products loaded:", data.products);
       } catch (error) {
-        console.error("Error loading product:", error);
-        setStatusMsg("Error loading product details.");
+        console.error("❌ Error fetching products:", error);
+        setStatusMsg("Error loading product listings.");
       } finally {
         setLoading(false);
       }
     }
-    loadProduct();
-  }, [prod_id]);
 
-  async function handleSave(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    formData.append("account_id", acct_id);
-    formData.append("product_id", prod_id);
+    fetchProducts();
+  }, [acct_id]);
 
-    try {
-      console.log("Submitting edit form...");
-      await editListing(formData);
-      router.push(`/dashboard/seller/${acct_id}/listings`);
-    } catch (error) {
-      console.error("Failed to update listing:", error);
-      setStatusMsg("Failed to update listing.");
-    }
-  }
-
-  if (loading) return <div className="p-4">Loading product...</div>;
-  if (!product) return <div className="p-4 text-red-600">Product not found.</div>;
+  if (loading) return <div className="p-4">Loading products...</div>;
+  if (!products.length) return <div className="p-4 text-gray-600">{statusMsg || "No products found."}</div>;
 
   return (
     <section className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-bold mb-4">Edit Product</h1>
+      <h1 className="text-3xl font-bold mb-4">Your Listings</h1>
 
       {statusMsg && <div className="text-red-600">{statusMsg}</div>}
 
-      <form onSubmit={handleSave} className="space-y-4 bg-white p-6 rounded shadow">
-        <input type="hidden" name="product_id" value={prod_id} />
-        <input type="hidden" name="account_id" value={acct_id} />
+      <ul className="space-y-4">
+        {products.map((product) => (
+          <li key={product.product_id} className="border p-4 rounded shadow">
+            <h2 className="text-lg font-semibold">{product.productName}</h2>
+            <p>{product.productDesc}</p>
+            <p className="text-gray-500">${product.price}</p>
 
-        <div>
-          <label className="block mb-1 font-semibold">Product Name</label>
-          <input type="text" name="productName" defaultValue={product.productName} className="w-full border p-2 rounded" required />
-        </div>
+            <div className="mt-4 flex gap-4">
+              <Link href={`/dashboard/seller/${acct_id}/edit/${product.product_id}`}>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                  Edit
+                </button>
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
 
-        <div>
-          <label className="block mb-1 font-semibold">Product Description</label>
-          <textarea name="productDesc" defaultValue={product.productDesc} className="w-full border p-2 rounded" required />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold">Category</label>
-          <select name="category" defaultValue={product.category} className="w-full border p-2 rounded">
-            <option value="Pottery">Pottery</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Jewelry">Jewelry</option>
-            <option value="Stickers">Stickers</option>
-            <option value="Woodworking">Woodworking</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold">Price</label>
-          <input type="number" name="price" step="0.01" defaultValue={product.price} className="w-full border p-2 rounded" required />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold">Image URL</label>
-          <input type="text" name="imageSRC" defaultValue={product.imageSRC} className="w-full border p-2 rounded" required />
-        </div>
-
-        <div className="flex gap-4">
-          <button type="submit" className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
-            Save Changes
-          </button>
-        </div>
-      </form>
-
-      {/* Back to Listings Button */}
+      {/* Back to Dashboard Button */}
       <div className="mt-6 flex justify-center">
-        <Link href={`/dashboard/seller/${acct_id}/listings`}>
+        <Link href={`/dashboard/seller/${acct_id}`}>
           <button className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
-            Back to Listings
+            Back to Dashboard
           </button>
         </Link>
       </div>
