@@ -89,19 +89,20 @@ export async function fetchReviewsByProductId(product_id: string): Promise<Revie
 
 // Fetch Average Rating for a Product
 export async function calculateAverageRating(product_id: string): Promise<number> {
-    try {
-        const data = await sql`
-            SELECT AVG(stars) AS average FROM "reviews"
-            WHERE product_id = ${product_id};
-        `;
+  try {
+      const data = await sql`
+          SELECT AVG(stars) AS average FROM "reviews"
+          WHERE product_id = ${product_id};
+      `;
 
-        const result = data.rows[0]?.average; // Extract the average rating
-        return result !== null && result !== undefined ? parseFloat(result) : 0; // Ensure a number is returned
-    } catch (error) {
-        console.error("Error calculating average rating:", error);
-        throw error;
-    }
+      const result = data.rows[0]?.average; // Extract the average rating
+      return result !== null && result !== undefined ? parseFloat(result) : 0; // Ensure a number is returned
+  } catch (error) {
+      console.error("❌ Error calculating average rating:", error);
+      throw error;
+  }
 }
+
 
 
 // Fetch all product IDs for `generateStaticParams`

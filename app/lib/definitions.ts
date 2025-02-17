@@ -51,3 +51,6 @@ export type Review = {
     review: string;
     date: string;
 };
+export type ProductWithSeller = ProductsTable & {
+    businessName: string | null; // Sellers might not have a business name
+};

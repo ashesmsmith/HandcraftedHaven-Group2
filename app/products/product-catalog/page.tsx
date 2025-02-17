@@ -1,110 +1,30 @@
-"use client";
+import { sql } from "@vercel/postgres";
+import ProductCatalogClient from "@/app/ui/product/product-catalog";
+import { ProductsTable } from "@/app/lib/definitions"; // Import product type
 
-import { useState } from "react";
-import { products } from "@/app/lib/placeholder-data";
-import { accounts } from "@/app/lib/placeholder-data"; // Import accounts
+// Define a type for products with the seller's business name
+type ProductWithSeller = ProductsTable & { businessName: string | null };
 
-import CategoryFilter from "@/app/ui/filters/category-filter";
-import PriceFilter from "@/app/ui/filters/price-filter";
-import SellerFilter from "@/app/ui/filters/seller-filter";
-import ProductCard from "@/app/ui/product/product-card";
-import Link from "next/link";
+export default async function ProductCatalogPage(props: { searchParams?: Record<string, string> }) {
+  // ✅ Ensure searchParams is awaited before use
+  const searchParams = await Promise.resolve(props.searchParams || {});
 
-export default function ProductCatalog() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({
-    min: 0,
-    max: 1000,
-  });
-  const [selectedSeller, setSelectedSeller] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+  // 🛒 Fetch products from the database & enforce correct type
+  const { rows: products } = await sql<ProductWithSeller>`
+  SELECT p.product_id, p.account_id, p."productName", p."productDesc", 
+         p.category, p.color, p.price, p."imageSRC",
+         a."businessName"
+  FROM products p
+  LEFT JOIN accounts a ON p.account_id = a.account_id
+  WHERE a."account_type" = 'Seller'  -- ✅ Ensure we only get Sellers!
+`;
 
-  // Filter products based on the selected category, price range, and seller
-  const filteredProducts = products.filter((product) => {
-    const isInCategory =
-      selectedCategory === null || product.category === selectedCategory;
-    const isInPriceRange =
-      product.price >= priceRange.min && product.price <= priceRange.max;
-    const isFromSeller =
-      selectedSeller === null || product.account_id === selectedSeller;
-    return isInCategory && isInPriceRange && isFromSeller;
-  });
 
-  // Sort products based on the sortOrder
-  if (sortOrder) {
-    filteredProducts.sort((a, b) =>
-      sortOrder === "asc" ? a.price - b.price : b.price - a.price
-    );
-  }
+console.log("🔍 Sellers Data:", products.map(p => p.businessName)); // ✅ Debug output
 
-  // Handle "Clear Filters" Button
-  const clearFilters = () => {
-    setSelectedCategory(null);
-    setPriceRange({ min: 0, max: 1000 });
-    setSelectedSeller(null);
-    setSortOrder(null);
-  };
 
-  return (
-    <div className="flex flex-col md:flex-row md:space-x-6 p-4">
-      {/* Filters Section */}
-      <div className="w-full md:w-1/4 mb-6 md:mb-0">
-        <h2 className="text-xl font-bold mb-4">Product Catalog</h2>
 
-        {/* Category Filter */}
-        <CategoryFilter
-          categories={[...new Set(products.map((p) => p.category))]}
-          onFilterChange={setSelectedCategory}
-        />
 
-        {/* Seller Filter */}
-        <div className="mt-6">
-          <SellerFilter
-            sellers={[
-              ...new Map(
-                products
-                  .map((p) => {
-                    const seller = accounts.find(
-                      (acc) =>
-                        acc.account_id === p.account_id &&
-                        acc.account_type === "Seller"
-                    );
-                    return seller
-                      ? [seller.account_id, { account_id: seller.account_id, businessName: seller.businessName }]
-                      : null;
-                  })
-                  .filter((item): item is [string, { account_id: string; businessName: string }] => item !== null)
-              ).values(),
-            ]}
-            onFilterChange={setSelectedSeller}
-          />
-        </div>
-
-        {/* Price Filter */}
-        <div className="mt-6">
-          <PriceFilter
-            onPriceChange={(min, max) => setPriceRange({ min, max })}
-            onSortChange={setSortOrder}
-          />
-        </div>
-
-        {/* Clear Filters Button */}
-        <button
-          onClick={clearFilters}
-          className="mt-6 px-4 py-2 bg-[#F1ECE2] text-[#543A27] font-semibold rounded border-2 border-[#543A27] hover:bg-[#E5E0D4] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
-        >
-          Clear Filters
-        </button>
-      </div>
-
-      {/* Product Grid Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
-        {filteredProducts.map((product) => (
-          <Link href={`/products/${product.product_id}`} key={product.product_id}>
-            <ProductCard product={product} />
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
+  return <ProductCatalogClient products={products} searchParams={searchParams} />;
 }
+  
