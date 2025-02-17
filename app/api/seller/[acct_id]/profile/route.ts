@@ -1,19 +1,27 @@
-// app/api/seller/[acct_id]/profile/route.ts
 import { NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { acct_id: string } }
+  { params }: { params: Promise<{ acct_id?: string | undefined }> }
 ) {
-  const { acct_id } = params;
+  const resolvedParams = await params; 
+  const acct_id = resolvedParams.acct_id;
+
+  if (!acct_id) {
+    return NextResponse.json(
+      { error: "Seller ID is required" },
+      { status: 400 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { firstName, lastName, businessName, story_heading, story, image } = body;
-    
+
     console.log("Updating seller profile for acct_id:", acct_id, body);
 
-    // Note the quoted column names for accounts
+    // Make sure parameters are properly typed and used in queries
     const accountsResult = await sql`
       UPDATE accounts
       SET "firstName" = ${firstName},
@@ -23,7 +31,7 @@ export async function PUT(
     `;
     console.log("Accounts update result:", accountsResult.rowCount);
 
-    // Update the seller_profiles table (assuming these columns are stored in lowercase)
+    // Make sure seller_profiles update
     const profilesResult = await sql`
       UPDATE seller_profiles
       SET story_heading = ${story_heading},
@@ -33,11 +41,14 @@ export async function PUT(
     `;
     console.log("Seller profiles update result:", profilesResult.rowCount);
 
-    if (accountsResult.rowCount === 0 || profilesResult.rowCount === 0) {
-      throw new Error("No rows were updated. Verify the account exists and data is correct.");
+    if (accountsResult.rowCount === 0 && profilesResult.rowCount === 0) {
+      return NextResponse.json(
+        { error: "No rows were updated. Verify the account exists and data is correct." },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ message: "Profile updated successfully" });
+    return NextResponse.json({ message: "Profile updated successfully" }, { status: 200 });
   } catch (error) {
     console.error("Error updating seller profile:", error);
     return NextResponse.json(

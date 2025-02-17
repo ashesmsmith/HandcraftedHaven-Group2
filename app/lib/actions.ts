@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 
 // Schema for Adding & Editing Listings
 const ListingSchema = z.object({
-  product_id: z.string().optional(), // Not required for adding new products
+  product_id: z.string().optional(),
   account_id: z.string(),
   productName: z.string(),
   productDesc: z.string(),
@@ -42,7 +42,7 @@ const ListingSchema = z.object({
  */
 export async function fetchProductById(product_id: string) {
   try {
-    console.log(`🔍 Fetching product with ID: ${product_id}`);
+    console.log(`Fetching product with ID: ${product_id}`);
 
     const result = await sql`
       SELECT product_id, "productName", "productDesc", category, color, price, "imageSRC", account_id
@@ -80,7 +80,7 @@ export async function addListing(formData: FormData) {
     });
 
     const { account_id, productName, productDesc, category, color, price, imageSRC } = parsedData;
-    const newProductId = crypto.randomUUID(); // Generate a new UUID
+    const newProductId = crypto.randomUUID();
 
     console.log(`Adding new product with ID: ${newProductId}`);
 
@@ -100,11 +100,11 @@ export async function addListing(formData: FormData) {
 }
 
 /** 
- * 🔹 Edit an existing listing
+ * Edit an existing listing
  */
 export async function editListing(formData: FormData) {
   try {
-    console.log("🔄 Processing editListing...");
+    console.log("Processing editListing...");
 
     const parsedData = ListingSchema.parse({
       product_id: formData.get("product_id") as string,

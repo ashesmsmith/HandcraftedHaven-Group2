@@ -2,68 +2,89 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { editListing, fetchProductById } from "@/lib/actions"; // Import server actions
+import { editListing } from "@/lib/actions";
+import Link from "next/link";
+
+interface Product {
+  product_id: string;
+  productName: string;
+  productDesc: string;
+  category: string;
+  color: string;
+  price: number;
+  imageSRC: string;
+}
 
 export default function EditListingPage() {
-  const { acct_id, prod_id } = useParams() as { acct_id: string; prod_id: string };
+  const { acct_id, prod_id } = useParams<{ acct_id: string; prod_id: string }>();
   const router = useRouter();
-
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [statusMsg, setStatusMsg] = useState("");
 
   useEffect(() => {
     async function loadProduct() {
       try {
+        console.log(`🔍 Fetching product details for ID: ${prod_id}`);
         const res = await fetch(`/api/products/${prod_id}`);
         if (!res.ok) {
-          throw new Error("Failed to fetch product");
+          throw new Error(`Failed to fetch product: ${await res.text()}`);
         }
         const data = await res.json();
-        setProduct(data);
-      } catch (err) {
-        setError("Error loading product");
+        setProduct(data.product);
+        console.log("Product loaded:", data.product);
+      } catch (error) {
+        console.error("Error loading product:", error);
+        setStatusMsg("Error loading product details.");
       } finally {
         setLoading(false);
       }
     }
-
     loadProduct();
   }, [prod_id]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    formData.append("product_id", prod_id);
     formData.append("account_id", acct_id);
+    formData.append("product_id", prod_id);
 
-    await editListing(formData);
-    router.push(`/dashboard/seller/${acct_id}/listings`);
+    try {
+      console.log("Submitting edit form...");
+      await editListing(formData);
+      router.push(`/dashboard/seller/${acct_id}/listings`);
+    } catch (error) {
+      console.error("Failed to update listing:", error);
+      setStatusMsg("Failed to update listing.");
+    }
   }
 
-  if (loading) return <div>Loading product...</div>;
-  if (error) return <div className="text-red-600">{error}</div>;
+  if (loading) return <div className="p-4">Loading product...</div>;
+  if (!product) return <div className="p-4 text-red-600">Product not found.</div>;
 
   return (
-    <main className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="hidden" name="product_id" value={product.product_id} />
+    <section className="container mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold mb-4">Edit Product</h1>
+
+      {statusMsg && <div className="text-red-600">{statusMsg}</div>}
+
+      <form onSubmit={handleSave} className="space-y-4 bg-white p-6 rounded shadow">
+        <input type="hidden" name="product_id" value={prod_id} />
         <input type="hidden" name="account_id" value={acct_id} />
 
         <div>
-          <label>Product Name:</label>
-          <input type="text" name="productName" defaultValue={product.productName} required />
+          <label className="block mb-1 font-semibold">Product Name</label>
+          <input type="text" name="productName" defaultValue={product.productName} className="w-full border p-2 rounded" required />
         </div>
 
         <div>
-          <label>Product Description:</label>
-          <textarea name="productDesc" defaultValue={product.productDesc} required />
+          <label className="block mb-1 font-semibold">Product Description</label>
+          <textarea name="productDesc" defaultValue={product.productDesc} className="w-full border p-2 rounded" required />
         </div>
 
         <div>
-          <label>Category:</label>
-          <select name="category" defaultValue={product.category}>
+          <label className="block mb-1 font-semibold">Category</label>
+          <select name="category" defaultValue={product.category} className="w-full border p-2 rounded">
             <option value="Pottery">Pottery</option>
             <option value="Clothing">Clothing</option>
             <option value="Jewelry">Jewelry</option>
@@ -74,37 +95,30 @@ export default function EditListingPage() {
         </div>
 
         <div>
-          <label>Color:</label>
-          <select name="color" defaultValue={product.color}>
-            <option value="Black">Black</option>
-            <option value="White">White</option>
-            <option value="Gray">Gray</option>
-            <option value="Brown">Brown</option>
-            <option value="Red">Red</option>
-            <option value="Orange">Orange</option>
-            <option value="Yellow">Yellow</option>
-            <option value="Green">Green</option>
-            <option value="Blue">Blue</option>
-            <option value="Purple">Purple</option>
-            <option value="Pink">Pink</option>
-            <option value="Multi">Multi</option>
-          </select>
+          <label className="block mb-1 font-semibold">Price</label>
+          <input type="number" name="price" step="0.01" defaultValue={product.price} className="w-full border p-2 rounded" required />
         </div>
 
         <div>
-          <label>Price:</label>
-          <input type="number" name="price" step="0.01" defaultValue={product.price} required />
+          <label className="block mb-1 font-semibold">Image URL</label>
+          <input type="text" name="imageSRC" defaultValue={product.imageSRC} className="w-full border p-2 rounded" required />
         </div>
 
-        <div>
-          <label>Image URL:</label>
-          <input type="text" name="imageSRC" defaultValue={product.imageSRC} required />
+        <div className="flex gap-4">
+          <button type="submit" className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
+            Save Changes
+          </button>
         </div>
-
-        <button type="submit" className="bg-dark-green text-white px-4 py-2 rounded hover:bg-dark-brown">
-          Save Changes
-        </button>
       </form>
-    </main>
+
+      {/* Back to Listings Button */}
+      <div className="mt-6 flex justify-center">
+        <Link href={`/dashboard/seller/${acct_id}/listings`}>
+          <button className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
+            Back to Listings
+          </button>
+        </Link>
+      </div>
+    </section>
   );
 }

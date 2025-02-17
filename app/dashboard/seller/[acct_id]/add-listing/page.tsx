@@ -1,13 +1,15 @@
-// app/dashboard/seller/[acct_id]/add-listing/page.tsx
 "use client";
 
 import { useParams } from "next/navigation";
-import { addListing } from "@/lib/actions"; // Server action that saves the listing in the DB and redirects
-import { useTransition, FormEvent } from "react";
+import { addListing } from "@/lib/actions";
+import { useTransition, FormEvent, useState } from "react";
+import Link from "next/link";
 
 export default function AddListingPage() {
   const { acct_id } = useParams() as { acct_id: string };
   const [isPending, startTransition] = useTransition();
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const placeholderImage = "/prod_images/no-image.png"; // Ensure this path is correct
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,16 +19,19 @@ export default function AddListingPage() {
     // Append the seller's account id
     formData.append("account_id", acct_id);
 
-    // Generate a valid UUID for the new product (instead of using Date.now())
+    // Generate a valid UUID for the new product
     const newProductId = crypto.randomUUID();
     formData.append("product_id", newProductId);
 
     startTransition(async () => {
-      // Call the server action to add the listing.
-      // The server action now redirects to /dashboard/seller/{acct_id}/listings after a successful insertion.
       await addListing(formData);
     });
   }
+
+  // Handle change in image URL input field
+  const handleImageUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setImageUrl(event.target.value);
+  };
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -121,7 +126,7 @@ export default function AddListingPage() {
             />
           </div>
 
-          {/* Image URL */}
+          {/* Image URL Input */}
           <div>
             <label htmlFor="imageSRC" className="block font-medium mb-1">
               Image URL
@@ -130,18 +135,40 @@ export default function AddListingPage() {
               id="imageSRC"
               name="imageSRC"
               type="text"
-              required
+              value={imageUrl || ""}
+              onChange={handleImageUrlChange}
               className="w-full border rounded px-3 py-2"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-dark-green text-white py-2 rounded hover:bg-dark-brown transition"
-          >
-            {isPending ? "Submitting..." : "Add Listing"}
-          </button>
+          {/* Image Preview */}
+          <div>
+            <h2>Image Preview</h2>
+            <img
+              src={imageUrl || placeholderImage}
+              alt="Product Image Preview"
+              className="w-32 h-32 object-cover mt-2" // Smaller size for the preview
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-4">
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition"
+            >
+              {isPending ? "Submitting..." : "Add Listing"}
+            </button>
+            <Link href={`/dashboard/seller/${acct_id}/listings`} passHref>
+              <button
+                type="button"
+                className="w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition"
+              >
+                Back to Listings
+              </button>
+            </Link>
+          </div>
         </form>
       </div>
     </main>

@@ -3,7 +3,7 @@ import { sql } from "@vercel/postgres";
 
 export type Product = {
   product_id: string;
-  account_id: string; // seller's account id (matches accounts.account_id)
+  account_id: string; 
   productName: string;
   productDesc: string;
   price: number;

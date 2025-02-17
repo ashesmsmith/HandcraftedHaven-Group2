@@ -1,4 +1,3 @@
-// app/dashboard/seller/[acct_id]/listings/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,7 +13,7 @@ export type Product = {
 };
 
 export default function SellerListingsPage() {
-  const { acct_id } = useParams() as { acct_id: string };
+  const { acct_id } = useParams<{ acct_id: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -22,21 +21,18 @@ export default function SellerListingsPage() {
   useEffect(() => {
     async function loadProducts() {
       try {
+        console.log(`🔍 Fetching seller listings for account ID: ${acct_id}`);
         const res = await fetch(`/api/seller/${acct_id}/products`);
-        const textResponse = await res.text();
-        let data;
-        try {
-          data = JSON.parse(textResponse);
-        } catch (parseError) {
-          throw new Error("Failed to parse JSON from response: " + textResponse);
-        }
+
         if (!res.ok) {
-          setError(data.error || "Failed to load products");
-          return;
+          throw new Error(`Failed to fetch listings: ${res.statusText}`);
         }
+
+        const data = await res.json();
         if (!data.products) {
           throw new Error("Response JSON does not contain a 'products' key");
         }
+
         setProducts(data.products);
       } catch (err) {
         console.error("Error fetching seller products:", err);
@@ -54,13 +50,11 @@ export default function SellerListingsPage() {
   return (
     <section className="container mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold mb-6">Your Listings</h1>
+
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {products.map((prod) => (
-            <div
-              key={prod.product_id}
-              className="border rounded-md p-4 shadow hover:shadow-lg transition"
-            >
+            <div key={prod.product_id} className="border rounded-md p-4 shadow hover:shadow-lg transition">
               <div className="flex justify-center mb-4">
                 <Image
                   src={prod.imageSRC}
@@ -73,14 +67,12 @@ export default function SellerListingsPage() {
                   }}
                 />
               </div>
-              <h2 className="text-xl font-semibold text-center">
-                {prod.productName}
-              </h2>
-              <p className="text-sm text-center">
-                ${Number(prod.price).toFixed(2)}
-              </p>
+              <h2 className="text-xl font-semibold text-center">{prod.productName}</h2>
+              <p className="text-sm text-center">${Number(prod.price).toFixed(2)}</p>
+
+              {/* Edit Listing Button */}
               <Link href={`/dashboard/seller/${acct_id}/edit/${prod.product_id}`}>
-                <button className="mt-4 w-full bg-dark-green text-white py-2 rounded hover:bg-light-green transition">
+                <button className="mt-4 w-full bg-[#543A27] text-white py-2 rounded hover:bg-[#754D33] transition">
                   Edit Listing
                 </button>
               </Link>
@@ -88,10 +80,10 @@ export default function SellerListingsPage() {
           ))}
         </div>
       ) : (
-        <p className="text-center">No listings found.</p>
+        <p className="text-center text-gray-700">No listings found.</p>
       )}
 
-      {/* Bottom buttons */}
+      {/* Bottom Buttons */}
       <div className="mt-6 flex justify-center gap-4">
         <Link href={`/dashboard/seller/${acct_id}`}>
           <button className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">

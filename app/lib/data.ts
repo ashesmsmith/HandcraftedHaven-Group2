@@ -14,7 +14,7 @@ export async function fetchSellerAccountById(account_id: string) {
         `;
         return data.rows;
     } catch (error) {
-        console.error('❌ Error with fetchSellerAccountById:', error);
+        console.error('Error with fetchSellerAccountById:', error);
         throw error;
     }
 }
@@ -31,7 +31,7 @@ export async function fetchProductById(product_id: string): Promise<ProductsTabl
         `;
         return data.rows[0] ?? null; // Return the first row or null if no product is found
     } catch (error) {
-        console.error("❌ Error fetching product by ID:", error);
+        console.error("Error fetching product by ID:", error);
         throw error;
     }
 }
@@ -47,7 +47,7 @@ export async function fetchReviewsByProductId(product_id: string): Promise<Revie
         `;
         return data.rows.length > 0 ? data.rows : []; // Returns an array of reviews (without date)
     } catch (error) {
-        console.error("❌ Error fetching reviews:", error);
+        console.error("Error fetching reviews:", error);
         return [];
     }
 }
@@ -62,7 +62,7 @@ export async function fetchOrderById(order_id: string) {
         `;
         return data.rows;
     } catch (error) {
-        console.error('❌ Error with fetchOrderById:', error);
+        console.error('Error with fetchOrderById:', error);
         throw error;
     }
 }
@@ -77,7 +77,7 @@ export async function calculateAverageRating(product_id: string): Promise<number
         const result = data.rows[0]?.average; // Extract the average rating
         return result !== null && result !== undefined ? parseFloat(result) : 0; // Ensure a number is returned
     } catch (error) {
-        console.error("❌ Error calculating average rating:", error);
+        console.error("Error calculating average rating:", error);
         throw error;
     }
 }

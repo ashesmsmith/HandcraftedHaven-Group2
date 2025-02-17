@@ -5,10 +5,20 @@ import { useParams, useRouter } from "next/navigation";
 import { editListing, deleteListing } from "@/lib/actions";
 import Link from "next/link";
 
+interface Product {
+  product_id: string;
+  productName: string;
+  productDesc: string;
+  category: string;
+  color: string;
+  price: number;
+  imageSRC: string;
+}
+
 export default function EditListingPage() {
   const { acct_id, prod_id } = useParams() as { acct_id: string; prod_id: string };
   const router = useRouter();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusMsg, setStatusMsg] = useState("");
 
@@ -22,9 +32,9 @@ export default function EditListingPage() {
         }
         const data = await res.json();
         setProduct(data.product);
-        console.log("✅ Product loaded:", data.product);
+        console.log("Product loaded:", data.product);
       } catch (error) {
-        console.error("❌ Error loading product:", error);
+        console.error("Error loading product:", error);
         setStatusMsg("Error loading product details.");
       } finally {
         setLoading(false);
@@ -52,7 +62,7 @@ export default function EditListingPage() {
   async function handleDelete() {
     if (!confirm("Are you sure you want to delete this listing?")) return;
     try {
-      console.log(`Deleting product ID: ${prod_id}`);
+      console.log(`🗑️ Deleting product ID: ${prod_id}`);
       await deleteListing(prod_id, acct_id);
       router.push(`/dashboard/seller/${acct_id}/listings`);
     } catch (error) {
@@ -128,7 +138,7 @@ export default function EditListingPage() {
           <button type="submit" className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
             Save Changes
           </button>
-          <button type="button" onClick={handleDelete} className="bg-[#543A27] text-white px-4 py-2 rounded hover:bg-[#754D33] transition">
+          <button type="button" onClick={handleDelete} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
             Delete Listing
           </button>
         </div>

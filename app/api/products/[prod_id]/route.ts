@@ -1,36 +1,35 @@
-import { NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
+import { NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
-  { params }: { params: { prod_id?: string } }
+  req: Request,
+  context: { params: Promise<{ prod_id?: string }> }
 ) {
-  if (!params.prod_id) {
-    console.error("🚨 Missing product ID in API request");
-    return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+  const { prod_id } = await context.params;
+
+  if (!prod_id) {
+    return NextResponse.json(
+      { error: "Product ID is required" },
+      { status: 400 }
+    );
   }
 
   try {
-    console.log("🔍 Fetching product with id:", params.prod_id);
-    const result = await sql`
-      SELECT product_id, "productName", "productDesc", category, color, price::numeric, "imageSRC", account_id
-      FROM products
-      WHERE product_id = ${params.prod_id}
-      LIMIT 1
-    `;
-
-    if (result.rows.length === 0) {
-      console.error(`🚨 Product not found: ${params.prod_id}`);
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    const product = await sql`SELECT * FROM products WHERE product_id = ${prod_id}`;
+    
+    if (!product || product.rows.length === 0) {
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 }
+      );
     }
 
-    const product = result.rows[0];
-    product.price = Number(product.price); // Ensure price is a number
-
-    console.log("✅ Product fetched:", product);
-    return NextResponse.json({ product });
+    return NextResponse.json({ product: product.rows[0] }, { status: 200 });
   } catch (error) {
-    console.error("❌ Error fetching product:", error);
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+    console.error("Error fetching product:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

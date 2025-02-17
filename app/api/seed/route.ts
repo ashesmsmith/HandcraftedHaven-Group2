@@ -1,11 +1,6 @@
 import bcrypt from "bcrypt";
 import { db } from "@vercel/postgres";
-import {
-  accounts,
-  products,
-  orders,
-  order_products,
-} from "@/lib/placeholder-data"; // Removed seller_profiles import
+import { accounts, products, orders, order_products } from "@/lib/placeholder-data"; // Adjust path if needed
 
 // Connect once (for this route)
 const client = await db.connect();
@@ -222,10 +217,13 @@ async function seedOrder_Products() {
   return insertedOrder_Products;
 }
 
-// Call all seeding functions sequentially
-await seedAccounts();
-await seedProducts();
-await seedOrders();
-await seedOrder_Products();
-
-
+// Check environment and skip seeding in production
+if (process.env.NODE_ENV === 'production') {
+  console.log('Skipping seeding in production environment...');
+} else {
+  // Call all seeding functions sequentially for non-production environments
+  await seedAccounts();
+  await seedProducts();
+  await seedOrders();
+  await seedOrder_Products();
+}

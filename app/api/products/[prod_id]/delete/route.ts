@@ -1,37 +1,41 @@
+import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
-import { deleteListing } from "@/lib/actions";
 
 export async function DELETE(
-  request: Request,
-  context: { params: { prod_id?: string } }
+  req: Request,
+  context: { params: Promise<{ prod_id?: string }> }
 ) {
+  // Await the params
+  const { prod_id } = await context.params;
+
+  if (!prod_id) {
+    return NextResponse.json(
+      { error: "Product ID is required" },
+      { status: 400 }
+    );
+  }
+
   try {
-    if (!context.params || !context.params.prod_id) {
-      return NextResponse.json({ error: "Product ID is missing" }, { status: 400 });
+    // Make sure the product exists before deleting
+    const existingProduct =
+      await sql`SELECT * FROM products WHERE product_id = ${prod_id}`;
+
+    if (!existingProduct || existingProduct.rows.length === 0) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const { prod_id } = context.params;
+    // Delete the product from the database
+    await sql`DELETE FROM products WHERE product_id = ${prod_id}`;
 
-    // Extract account ID from request body
-    const body = await request.json();
-    const { acct_id } = body;
-
-    if (!acct_id) {
-      return NextResponse.json({ error: "Account ID is missing" }, { status: 400 });
-    }
-
-    console.log(`🗑️ Deleting product with ID: ${prod_id} for account ID: ${acct_id}`);
-
-    // Call delete function from actions.ts
-    const result = await deleteListing(prod_id, acct_id);
-
-    if ("error" in result) {
-      return NextResponse.json({ error: result.error }, { status: 500 });
-    }
-
-    return NextResponse.json({ message: "Product deleted successfully" });
+    return NextResponse.json(
+      { message: "Product deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error("❌ Error deleting product:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Error deleting product:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

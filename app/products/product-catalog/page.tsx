@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import CategoryFilter from "@/ui/filters/category-filter"; // Adjusted relative path
-import PriceFilter from "@/ui/filters/price-filter"; // Adjusted relative path
-import SellerFilter from "@/ui/filters/seller-filter"; // Adjusted relative path
-import ProductCard from "@/ui/product/product-card"; // Adjusted relative path
+import CategoryFilter from "@/ui/filters/category-filter"; 
+import PriceFilter from "@/ui/filters/price-filter"; 
+import SellerFilter from "@/ui/filters/seller-filter"; 
+import ProductCard from "@/ui/product/product-card"; 
 
 export type Product = {
   product_id: string;
