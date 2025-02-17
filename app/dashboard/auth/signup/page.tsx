@@ -18,9 +18,9 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
 
-    // Basic checks
-    if (!email || !password || !confirmPassword) {
-      setError("Please fill all fields.");
+    // Basic validation
+    if (!email || !password || !confirmPassword || !firstName || !lastName) {
+      setError("Please fill in all required fields.");
       return;
     }
     if (password !== confirmPassword) {
@@ -29,7 +29,7 @@ export default function SignUpPage() {
     }
 
     try {
-      // Call  /api/auth/register route
+      console.log("Sending Signup Request...");
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,13 +42,15 @@ export default function SignUpPage() {
           businessName
         })
       });
+
       const data = await res.json();
+      console.log("Signup Response:", data);
+
       if (!res.ok) {
         setError(data.error || "Registration failed");
         return;
       }
 
-      // 2. On success
       alert("Registration successful. You can now log in.");
       router.push("/dashboard/auth/login");
     } catch (err) {
@@ -66,113 +68,42 @@ export default function SignUpPage() {
         <form className="space-y-4" onSubmit={handleSignUp}>
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block mb-1 font-medium text-dark-brown">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded 
-                         focus:outline-none focus:ring-2 focus:ring-dark-green"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <label className="block mb-1 font-medium text-dark-brown">Email</label>
+            <input type="email" className="w-full border px-3 py-2 rounded" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block mb-1 font-medium text-dark-brown">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded
-                         focus:outline-none focus:ring-2 focus:ring-dark-green"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <label className="block mb-1 font-medium text-dark-brown">Password</label>
+            <input type="password" className="w-full border px-3 py-2 rounded" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label htmlFor="confirm-password" className="block mb-1 font-medium text-dark-brown">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirm-password"
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded
-                         focus:outline-none focus:ring-2 focus:ring-dark-green"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+            <label className="block mb-1 font-medium text-dark-brown">Confirm Password</label>
+            <input type="password" className="w-full border px-3 py-2 rounded" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
 
-          {/* Optional extra fields */}
+          {/* First Name */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">First Name</label>
-            <input
-              type="text"
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
+            <input type="text" className="w-full border px-3 py-2 rounded" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           </div>
 
+          {/* Last Name */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">Last Name</label>
-            <input
-              type="text"
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
+            <input type="text" className="w-full border px-3 py-2 rounded" value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
 
-          <div>
-            <label className="block mb-1 font-medium text-dark-brown">Business Name</label>
-            <input
-              type="text"
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-            />
-          </div>
-
-          {/* New: Account Type selection */}
-          <div>
-            <label className="block mb-1 font-medium text-dark-brown">Account Type</label>
-            <select
-              className="w-full border border-dark-brown/20 px-3 py-2 rounded"
-              value={accountType}
-              onChange={(e) => setAccountType(e.target.value)}
-            >
-              <option value="Seller">Seller</option>
-              <option value="Customer">Customer</option>
-            </select>
-          </div>
-
-          {/* Error */}
+          {/* Error Message */}
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="bg-dark-brown text-cream w-full py-2 rounded
-                       hover:bg-light-brown hover:text-white transition-colors
-                       font-semibold"
-          >
+          {/* Submit Button */}
+          <button type="submit" className="bg-dark-brown text-cream w-full py-2 rounded hover:bg-light-brown transition-colors font-semibold">
             Sign Up
           </button>
         </form>
-
-        {/* Link to Login */}
-        <div className="mt-4">
-          <a href="/dashboard/auth/login" className="text-sm text-dark-brown/70 hover:underline">
-            Already have an account? Login here.
-          </a>
-        </div>
       </div>
     </section>
   );

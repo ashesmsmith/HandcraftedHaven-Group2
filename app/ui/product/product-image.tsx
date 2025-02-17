@@ -6,7 +6,7 @@ interface ProductImageProps {
 
 export default function ProductImage({ imageUrl }: ProductImageProps) {
   return (
-    <div className="relative w-full h-96 bg-gray-200 p-4">
+    <div className="relative w-full h-96 bg-gray-200 p-4 flex justify-center items-center">
       {/* Heart icon overlay */}
       <div className="absolute top-2 left-2 p-2 bg-black rounded-full">
         <svg
@@ -19,15 +19,13 @@ export default function ProductImage({ imageUrl }: ProductImageProps) {
         </svg>
       </div>
 
-      {/* Container for the Image to fill */}
+      {/* Image container with `object-contain` for full visibility */}
       <div className="relative w-full h-full">
         <Image
           src={imageUrl}
           alt="Product"
           fill
-          className="object-cover rounded-lg"
-          // Optionally: priority
-          // priority
+          className="object-contain rounded-lg" // 👈 Ensures the full image is visible without cropping
         />
       </div>
     </div>

@@ -22,19 +22,20 @@ export default function SellerFilter({
   return (
     <div>
       <h3 className="text-lg font-bold mb-2">Filter by Seller</h3>
-            <select
+      <select
         value={selectedSeller || ''}
         onChange={handleSellerChange}
         className="w-full border rounded p-2 bg-[#F1ECE2] text-[#543A27] hover:bg-[#E5E0D4] focus:outline-none focus:ring-2 focus:ring-[#543A27] focus:ring-offset-2"
       >
-        <option value="">All Sellers</option>
-        {sellers.map((seller) => (
-          <option key={seller} value={seller}>
+        <option key="all" value="">
+          All Sellers
+        </option>
+        {sellers.map((seller, index) => (
+          <option key={`${seller}-${index}`} value={seller}>
             Seller ID: {seller}
           </option>
         ))}
       </select>
-
     </div>
   );
 }

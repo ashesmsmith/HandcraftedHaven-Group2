@@ -1,29 +1,49 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { fetchSellerAccountById } from "@/app/lib/data"; // or your actual path
-
-
-type SellerRouteContext = {
-  params: Promise<{ acct_id: string }>;
-};
+import { fetchSellerAccountById } from "@/lib/data";
 
 export async function GET(
-  _req: NextRequest,
-  { params }: SellerRouteContext
-) {
-  const { acct_id } = await params;
-
+  request: Request,
+  { params }: { params: Promise<{ acct_id?: string }> }
+): Promise<NextResponse> {
   try {
-    // If fetchSellerAccountById returns an array or null
-    const sellerData = await fetchSellerAccountById(acct_id);
-    if (!sellerData || sellerData.length === 0) {
-      return NextResponse.json({ error: "Seller not found" }, { status: 404 });
+    const resolvedParams = await params; 
+    const { acct_id } = resolvedParams;
+
+    console.log("Fetching seller for ID:", acct_id);
+
+    if (!acct_id) {
+      return NextResponse.json(
+        { error: "Seller ID is required" },
+        { status: 400 }
+      );
     }
 
-    // Return the first row
-    return NextResponse.json(sellerData[0], { status: 200 });
-  } catch (error) {
-    console.error("GET /api/seller/[acct_id] error:", error);
-    return NextResponse.json({ error: String(error) }, { status: 500 });
+    // Make sure fetchSellerAccountById is correctly typed
+    const sellers = await fetchSellerAccountById(acct_id);
+    const seller = Array.isArray(sellers) ? sellers[0] : sellers;
+
+    if (!seller) {
+      console.error("Seller not found:", acct_id);
+      return NextResponse.json(
+        { error: "Seller not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(seller);
+  } catch (error: unknown) {
+    console.error("Error fetching seller:", error);
+
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Failed to fetch seller" },
+      { status: 500 }
+    );
   }
 }
