@@ -24,14 +24,7 @@ export default function ProductDetails({
       <p className={`${montserrat.className} text-base md:text-lg text-gray-600 mb-4`}>
         {product.description}
       </p>
-      {/* Add to Cart Button */}
-      <div className="flex justify-end mb-8">
-        <AddToCartButton
-          onClick={() => {
-            console.log(`${product.name} added to cart`);
-          }}
-        />
-      </div>
+      
     </div>
   );
 }

@@ -1,10 +1,10 @@
 "use client"; 
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Image from "next/image";
 import Carousel from "./ui/Carousel";
 
-//Define the Product type
+// Define the Product type
 type Product = {
   product_id: string;
   productName: string;
@@ -35,30 +35,26 @@ export default function HomePage() {
 
   return (
     <section className="container mx-auto flex flex-col items-center justify-center text-center py-20 px-6">
-      <h1 className="text-4xl md:text-5xl font-bold mb-2 font-serif">
-        Handcrafted Haven
-      </h1>
-      <p className="text-lg text-dark-brown/70 mb-6">Custom Creations</p>
-
-      <div className="flex space-x-4">
-        <Link href="/dashboard/auth/login">
-          <button className="border bg-dark-green border-dark-brown text-white px-6 py-2 rounded hover:bg-dark-brown hover:text-cream transition-colors">
-            Login
-          </button>
-        </Link>
-        <Link href="/dashboard/auth/signup">
-          <button className="bg-dark-brown text-cream px-6 py-2 rounded hover:bg-light-brown hover:text-white transition-colors">
-            Register
-          </button>
-        </Link>
+      {/* Logo with Thicker Border */}
+      <div className="bg-white border-4 border-dark-brown shadow-lg p-6 rounded-lg flex justify-center items-center">
+        <div className="relative w-60 h-60">
+          <Image
+            src="/logo.webp"
+            alt="Handcrafted Haven Logo"
+            layout="fill"
+            objectFit="contain"
+            priority
+          />
+        </div>
       </div>
 
-      {loading && <p className="text-gray-500 mt-10">Loading products...</p>}
-      {error && <p className="text-red-600 mt-10">{error}</p>}
+      {/* Show loading, error, or carousel */}
+      {loading && <p className="text-gray-500 mt-10 text-xl">Loading products...</p>}
+      {error && <p className="text-red-600 mt-10 text-xl">{error}</p>}
 
       {/* Display products in carousel if available */}
-      {products.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-10">
+      {products.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-12">
           <Carousel
             images={products.slice(0, Math.ceil(products.length / 2)).map((product) => ({
               src: product.imageSRC,
@@ -74,10 +70,13 @@ export default function HomePage() {
             interval={4000}
           />
         </div>
-      )}
-
-      {products.length === 0 && !loading && !error && (
-        <p className="text-gray-500 mt-10">No products available at the moment.</p>
+      ) : (
+        !loading &&
+        !error && (
+          <p className="text-gray-500 mt-10 text-lg">
+            No products available at the moment. Check back soon!
+          </p>
+        )
       )}
     </section>
   );

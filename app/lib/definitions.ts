@@ -1,11 +1,10 @@
-
 export type SellerAccountsTable = {
     account_id: string;
     account_type: 'Seller';
     firstName: string;
     lastName: string;
-    businessName: string;
-    tax_id: number;
+    businessName: string | null;  
+    tax_id: number | null;        
     address: string;
     phone: string;
     email: string;
@@ -14,18 +13,18 @@ export type SellerAccountsTable = {
     story_heading: string;
     story: string;
     image: string;
-}
+};
 
 export type ProductsTable = {
     product_id: string;
     account_id: string;
     productName: string;
     productDesc: string;
-    category: 'Pottery' | 'Clothing' |  'Jewelry' |  'Stickers' |  'Woodworking' |  'Other'
-    color: 'Black' |  'White' |  'Gray' |  'Brown' |  'Red' |  'Orange' |  'Yellow' |  'Green' |  'Blue' |  'Purple' |  'Pink' |  'Multi'
-    price: string;
+    category: 'Pottery' | 'Clothing' | 'Jewelry' | 'Stickers' | 'Woodworking' | 'Other';
+    color: 'Black' | 'White' | 'Gray' | 'Brown' | 'Red' | 'Orange' | 'Yellow' | 'Green' | 'Blue' | 'Purple' | 'Pink' | 'Multi';
+    price: number;     // Updated from string to number for consistency
     imageSRC: string;
-}
+};
 
 export type OrdersTable = {
     order_id: string;
@@ -35,7 +34,7 @@ export type OrdersTable = {
     tax: number;
     final_total: number;
     status: 'Shipped' | 'Canceled' | 'Processed';
-}
+};
 
 export type OrderProductsTable = {
     order_id: string;
@@ -43,7 +42,8 @@ export type OrderProductsTable = {
     price: number;
     quantity: number;
     total: number;
-}
+};
+
 export type Review = {
     product_id: string;
     account_id: string;
