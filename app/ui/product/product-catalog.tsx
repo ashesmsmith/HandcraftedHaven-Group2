@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CategoryFilter from "@/app/ui/filters/category-filter";
-import PriceFilter from "@/app/ui/filters/price-filter";
-import SellerFilter from "@/app/ui/filters/seller-filter";
-import ProductCard from "@/app/ui/product/product-card";
+import CategoryFilter from "@/ui/filters/category-filter";
+import PriceFilter from "@/ui/filters/price-filter";
+import SellerFilter from "@/ui/filters/seller-filter";
+import ProductCard from "@/ui/product/product-card";
 import Link from "next/link";
 
 // ✅ Define ProductWithSeller Type

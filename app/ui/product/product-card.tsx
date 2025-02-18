@@ -8,7 +8,7 @@ export default function ProductCard({
     product_id: string;
     productName: string;
     productDesc: string;
-    price: number;
+    price: number | string;
     imageSRC: string;
   };
   onAddToCart: (productId: string) => void; // Add function prop to handle add to cart
@@ -31,7 +31,7 @@ export default function ProductCard({
       </div>
       <h2 className="text-lg font-bold">{product.productName}</h2>
       <p className="text-sm text-gray-600">{product.productDesc}</p>
-      <p className="text-md font-semibold">${product.price.toFixed(2)}</p>
+      <p className="text-md font-semibold">${typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price).toFixed(2)}</p>
 
       {/* Add to Cart Button */}
       <button

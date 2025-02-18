@@ -29,7 +29,7 @@ export default function SellerFilter({
         <option value="">All Sellers</option>
         {sellers.map((seller) => (
           <option key={seller.account_id} value={seller.account_id}>
-            {seller.businessName} {/* ✅ Now correctly displays business name */}
+            {seller.businessName} {/* Display seller's business name */}
           </option>
         ))}
       </select>

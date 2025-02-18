@@ -1,15 +1,15 @@
 import { notFound } from "next/navigation";
-import { fetchProductById, fetchReviewsByProductId, calculateAverageRating, fetchAllProducts } from "@/app/lib/data";
-import ProductImage from "@/app/ui/product/product-image";
-import ProductDetails from "@/app/ui/product/product-details";
-import { montserrat } from "@/app/ui/fonts";
-import AddReviewForm from "@/app/ui/product/add-review-form";
+import { fetchProductById, fetchReviewsByProductId, calculateAverageRating, fetchAllProducts } from "@/lib/data";
+import ProductImage from "@/ui/product/product-image";
+import ProductDetails from "@/ui/product/product-details";
+import { montserrat } from "@/ui/fonts";
+import AddReviewForm from "@/ui/product/add-review-form";
 
 
 // tells Next.js to generate static paths for dynamic routes
 export async function generateStaticParams() { 
   const products = await fetchAllProducts(); //fetch all but retrieve only product_id
-  return products.map((product) => ({ product_id: product.product_id })); // Map the products into the next.js format
+  return products.map((product: { product_id: string }) => ({ product_id: product.product_id })); // Map the products into the next.js format
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
