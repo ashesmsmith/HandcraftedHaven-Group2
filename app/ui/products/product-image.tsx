@@ -1,3 +1,6 @@
+"use client"; 
+
+import { useState } from "react";
 import Image from "next/image";
 
 interface ProductImageProps {
@@ -5,6 +8,8 @@ interface ProductImageProps {
 }
 
 export default function ProductImage({ imageUrl }: ProductImageProps) {
+  const [imgSrc, setImgSrc] = useState(imageUrl);
+
   return (
     <div className="relative w-full h-96 bg-gray-200 p-4 flex justify-center items-center">
       {/* Heart icon overlay */}
@@ -22,10 +27,11 @@ export default function ProductImage({ imageUrl }: ProductImageProps) {
       {/* Image container with `object-contain` for full visibility */}
       <div className="relative w-full h-full">
         <Image
-          src={imageUrl}
-          alt="Product"
+          src={imgSrc}
+          alt="Product Image"
           fill
-          className="object-contain rounded-lg" // 👈 Ensures the full image is visible without cropping
+          className="object-contain rounded-lg"
+          onError={() => setImgSrc("/placeholder.jpg")} 
         />
       </div>
     </div>
