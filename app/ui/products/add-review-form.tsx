@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { addReview } from "@/lib/reviewAction";
+import { useState, useEffect } from "react";
+import { fetchReviewsByProductId, addReview } from "@/lib/reviewAction"; 
 import type { Review } from "@/lib/definitions";
 
 export default function AddReviewForm({ productId }: { productId: string }) {
@@ -10,6 +10,19 @@ export default function AddReviewForm({ productId }: { productId: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  // ✅ Fetch latest reviews when component loads
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const latestReviews = await fetchReviewsByProductId(productId);
+        setReviews(latestReviews);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+    loadReviews();
+  }, [productId]); // Runs when productId changes
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,7 +44,10 @@ export default function AddReviewForm({ productId }: { productId: string }) {
       const response = await addReview({}, formData);
 
       if (response.success && response.review) {
-        setReviews((prevReviews) => [...prevReviews, response.review as Review]);
+        // ✅ Re-fetch latest reviews after submission
+        const updatedReviews = await fetchReviewsByProductId(productId);
+        setReviews(updatedReviews);
+
         setReviewText("");
         setRating(5);
       } else if (response.errors) {
