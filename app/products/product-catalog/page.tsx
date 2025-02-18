@@ -6,17 +6,17 @@ import { ProductsTable } from "@/app/lib/definitions"; // Import product type
 type ProductWithSeller = ProductsTable & { businessName: string | null };
 
 export default async function ProductCatalogPage(props: { searchParams?: Record<string, string> }) {
-  // ✅ Ensure searchParams is awaited before use
+  // Ensure searchParams is awaited before use
   const searchParams = await Promise.resolve(props.searchParams || {});
 
-  // 🛒 Fetch products from the database & enforce correct type
+  // Fetch products from the database & enforce correct type
   const { rows: products } = await sql<ProductWithSeller>`
   SELECT p.product_id, p.account_id, p."productName", p."productDesc", 
          p.category, p.color, p.price, p."imageSRC",
          a."businessName"
   FROM products p
   LEFT JOIN accounts a ON p.account_id = a.account_id
-  WHERE a."account_type" = 'Seller'  -- ✅ Ensure we only get Sellers!
+  WHERE a."account_type" = 'Seller'  -- Ensure we only get Sellers!
 `;
 
 
