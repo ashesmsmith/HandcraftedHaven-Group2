@@ -9,8 +9,8 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [accountType, setAccountType] = useState("Seller");
+  const [businessName] = useState(""); // Unused state variable removed
+  const [accountType] = useState("Seller"); // Unused state variable removed
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -18,7 +18,6 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
 
-    // Basic validation
     if (!email || !password || !confirmPassword || !firstName || !lastName) {
       setError("Please fill in all required fields.");
       return;
@@ -44,8 +43,6 @@ export default function SignUpPage() {
       });
 
       const data = await res.json();
-      console.log("Signup Response:", data);
-
       if (!res.ok) {
         setError(data.error || "Registration failed");
         return;
@@ -66,40 +63,29 @@ export default function SignUpPage() {
           Sign Up
         </h1>
         <form className="space-y-4" onSubmit={handleSignUp}>
-          {/* Email */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">Email</label>
             <input type="email" className="w-full border px-3 py-2 rounded" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-
-          {/* Password */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">Password</label>
             <input type="password" className="w-full border px-3 py-2 rounded" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-
-          {/* Confirm Password */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">Confirm Password</label>
             <input type="password" className="w-full border px-3 py-2 rounded" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
-
-          {/* First Name */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">First Name</label>
             <input type="text" className="w-full border px-3 py-2 rounded" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           </div>
-
-          {/* Last Name */}
           <div>
             <label className="block mb-1 font-medium text-dark-brown">Last Name</label>
             <input type="text" className="w-full border px-3 py-2 rounded" value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
 
-          {/* Error Message */}
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Submit Button */}
           <button type="submit" className="bg-dark-brown text-cream w-full py-2 rounded hover:bg-light-brown transition-colors font-semibold">
             Sign Up
           </button>

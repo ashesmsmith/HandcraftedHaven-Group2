@@ -104,7 +104,7 @@ export default function NavBar() {
                 </button>
               </Link>
 
-              <Link href="/cart">
+              <Link href="/dashboard/buyer/cart">
                 <button
                   className={`py-2 px-4 rounded transition-colors ${
                     pathname === "/cart"
@@ -176,7 +176,7 @@ export default function NavBar() {
                   </button>
                 </Link>
 
-                <Link href="/cart">
+                <Link href="cart">
                   <button
                     onClick={() => setMenuOpen(false)}
                     className="w-full text-left bg-dark-green text-white py-2 px-4 rounded hover:bg-dark-brown transition-colors"
