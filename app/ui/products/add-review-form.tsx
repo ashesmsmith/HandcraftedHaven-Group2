@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { addReview } from "@/lib/reviewAction";
+import { useState, useEffect } from "react";
+import { fetchReviewsByProductId, addReview } from "@/lib/reviewAction"; // ✅ Correct import
 import type { Review } from "@/lib/definitions";
 
 export default function AddReviewForm({ productId }: { productId: string }) {
@@ -10,6 +10,19 @@ export default function AddReviewForm({ productId }: { productId: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  // ✅ Fetch latest reviews when component loads
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const latestReviews = await fetchReviewsByProductId(productId);
+        setReviews(latestReviews);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+    loadReviews();
+  }, [productId]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,21 +36,18 @@ export default function AddReviewForm({ productId }: { productId: string }) {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("product_id", productId);
-      formData.append("stars", rating.toString());
-      formData.append("review", reviewText.trim());
+      // ✅ Call `addReview` with the correct number of arguments
+      const response = await addReview(productId, rating, reviewText.trim());
 
-      const response = await addReview({}, formData);
+      if (response.success) {
+        // ✅ Re-fetch latest reviews after submission
+        const updatedReviews = await fetchReviewsByProductId(productId);
+        setReviews(updatedReviews);
 
-      if (response.success && response.review) {
-        setReviews((prevReviews) => [...prevReviews, response.review as Review]);
         setReviewText("");
         setRating(5);
-      } else if (response.errors) {
-        setErrorMessage(Object.values(response.errors).flat().join(", "));
       } else {
-        setErrorMessage("Something went wrong. Please try again.");
+        setErrorMessage(response.error || "Something went wrong. Please try again.");
       }
     } catch (error) {
       console.error("Error while submitting review:", error);
@@ -87,6 +97,33 @@ export default function AddReviewForm({ productId }: { productId: string }) {
           {submitting ? "Submitting..." : "Submit Review"}
         </button>
       </form>
+
+      {/* ✅ Display Reviews (Auto-refreshes) */}
+      <div className="mt-6">
+        <h3 className="text-lg font-bold">Customer Reviews</h3>
+        {reviews.length === 0 ? (
+          <p className="text-gray-500">No reviews yet. Be the first to review!</p>
+        ) : (
+          <ul className="mt-2">
+            {reviews.map((review, index) => (
+              <li key={`${review.date}-${review.account_id ?? index}`} className="border p-2 rounded my-2">
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className={i < review.stars ? "text-yellow-500" : "text-gray-300"}>
+                      ★
+                    </span>
+                  ))}
+                  <p className="ml-2 text-sm text-gray-600">{review.stars} / 5</p>
+                </div>
+                <p>{review.review}</p>
+                <p className="text-sm text-gray-500">
+                  Reviewed on {new Date(review.date).toLocaleDateString()}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
