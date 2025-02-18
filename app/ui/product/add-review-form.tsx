@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { addReview } from "@/app/lib/reviewAction";
-import type { Review } from "@/app/lib/definitions";
+import { addReview } from "@/lib/reviewAction";
+import type { Review } from "@/lib/definitions";
 
 export default function AddReviewForm({ 
     productId, 

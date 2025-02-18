@@ -6,6 +6,7 @@ import { montserrat } from "@/ui/fonts";
 import AddReviewForm from "@/ui/product/add-review-form";
 
 
+
 // tells Next.js to generate static paths for dynamic routes
 export async function generateStaticParams() { 
   const products = await fetchAllProducts(); //fetch all but retrieve only product_id
