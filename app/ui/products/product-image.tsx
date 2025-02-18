@@ -24,14 +24,14 @@ export default function ProductImage({ imageUrl }: ProductImageProps) {
         </svg>
       </div>
 
-      {/* Image container with `object-contain` for full visibility */}
+      {/* Image container with full visibility */}
       <div className="relative w-full h-full">
         <Image
           src={imgSrc}
           alt="Product Image"
           fill
           className="object-contain rounded-lg"
-          onError={() => setImgSrc("/placeholder.jpg")} 
+          onError={() => setImgSrc("/no-image.png")} 
         />
       </div>
     </div>

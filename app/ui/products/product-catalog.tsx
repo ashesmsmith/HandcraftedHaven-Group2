@@ -4,10 +4,11 @@ import { useState } from "react";
 import CategoryFilter from "@/ui/filters/category-filter";
 import PriceFilter from "@/ui/filters/price-filter";
 import SellerFilter from "@/ui/filters/seller-filter";
-import ProductCard from "@/ui/products/product-card";
-import Link from "next/link"; // ✅ Ensure Link is being used properly
+import Image from "next/image"
+//import ProductCard from "@/ui/products/product-card";
+import Link from "next/link";
 
-// ✅ Define ProductWithSeller Type
+// Define ProductWithSeller Type
 export type ProductWithSeller = {
   product_id: string;
   account_id: string;
@@ -44,10 +45,10 @@ export default function ProductCatalogClient({
   // 🔍 Ensure price is a number
   const formattedProducts = products.map((product) => ({
     ...product,
-    price: Number(product.price), // ✅ Convert price to a number
+    price: Number(product.price), 
   }));
 
-  // 🔍 Filter products based on selected filters
+  // Filter products based on selected filters
   const filteredProducts = formattedProducts.filter((product) => {
     const isInCategory = !selectedCategory || product.category === selectedCategory;
     const isInPriceRange = product.price >= priceRange.min && product.price <= priceRange.max;
@@ -55,12 +56,12 @@ export default function ProductCatalogClient({
     return isInCategory && isInPriceRange && isFromSeller;
   });
 
-  // 🔄 Sort products
+  // Sort products
   if (sortOrder) {
     filteredProducts.sort((a, b) => (sortOrder === "asc" ? a.price - b.price : b.price - a.price));
   }
 
-  // 🧹 Clear Filters
+  // Clear Filters
   const clearFilters = () => {
     setSelectedCategory(null);
     setPriceRange({ min: 0, max: 1000 });
@@ -106,9 +107,11 @@ export default function ProductCatalogClient({
           <div key={product.product_id} className="border rounded-md p-4 shadow-lg flex flex-col items-center bg-white">
             {/* Product Image */}
             <div className="relative w-full h-48 mb-4">
-              <img
+              <Image
                 src={product.imageSRC}
                 alt={product.productName}
+                width={200} 
+                height={150} 
                 className="object-contain rounded-md w-full h-full"
               />
             </div>
@@ -118,7 +121,7 @@ export default function ProductCatalogClient({
             <p className="text-md font-bold text-center">${Number(product.price).toFixed(2)}</p>
             <p className="text-sm text-gray-600 text-center">{product.businessName}</p>
 
-            {/* ✅ View Product Button */}
+            {/* View Product Button */}
             <div className="w-full mt-4 flex justify-center">
               <Link href={`/products/${product.product_id}`} passHref>
                 <button className="bg-[#543A27] text-white py-2 px-4 rounded hover:bg-[#754D33] transition w-full text-center">

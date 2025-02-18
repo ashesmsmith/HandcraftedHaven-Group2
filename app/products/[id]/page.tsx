@@ -1,33 +1,46 @@
 import { notFound } from "next/navigation";
-import { fetchProductById, fetchReviewsByProductId, calculateAverageRating, fetchAllProducts } from "@/lib/data";
+import {
+  fetchProductById,
+  fetchReviewsByProductId,
+  calculateAverageRating,
+  fetchAllProducts,
+} from "@/lib/data";
 import ProductImage from "@/ui/products/product-image";
 import ProductDetails from "@/ui/products/product-details";
 import { montserrat } from "@/ui/fonts";
 import AddReviewForm from "@/ui/products/add-review-form";
 import { ProductsTable, Review } from "@/lib/definitions";
 
+// Define the props with params as a Promise
+interface ProductDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
 // Generate static paths for dynamic routes
 export async function generateStaticParams() {
   const products = await fetchAllProducts();
-  return products.map((product) => ({ id: product.product_id }));
+  return products.map((product) => ({
+    id: product.product_id.toString(),
+  })); 
 }
 
-// Define explicit types for fetched data
-interface ProductDetailPageProps {
-  params: { id: string }; // ✅ Ensuring `params` is not a Promise, just an object
-}
-
-// Main product page
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const { id } = params;
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
+  // Await the params to handle them as a promise
+  const { id } = await params;
 
   if (!id) {
     return notFound();
   }
 
   try {
-    // Fetch product data, reviews, and average rating in parallel
-    const [product, reviews, averageRating]: [ProductsTable | null, Review[], number | null] = await Promise.all([
+    // Fetch product data, reviews, and average rating 
+    const [product, reviews, averageRating]: [
+      ProductsTable | null,
+      Review[],
+      number | null
+    ] = await Promise.all([
       fetchProductById(id),
       fetchReviewsByProductId(id),
       calculateAverageRating(id),
@@ -38,31 +51,96 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     }
 
     return (
-      <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 px-4">
-        {/* Left: Product Image */}
-        <div className="w-full md:w-1/2 mt-4">
-          <ProductImage imageUrl={product.imageSRC || "/placeholder.jpg"} />
-        </div>
+      <div className="flex flex-col px-4 space-y-8">
+        {/* Product Image & Reviews*/}
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
+          {/* Product Image */}
+          <div className="w-full md:w-1/2">
+            <ProductImage imageUrl={product.imageSRC || "/no-image.png"} />
 
-        {/* Right: Product Details */}
-        <div className="w-full md:w-1/2">
-          <ProductDetails
-            product={{
-              name: product.productName,
-              price: Number(product.price).toFixed(2),
-              description: product.productDesc,
-            }}
-          />
+            {/* Reviews Directly Below Image */}
+            <div className="mt-6 space-y-6">
+              {/* Average Rating */}
+              <div className="border rounded-md p-4 shadow-md bg-white">
+                <h3 className="text-lg font-bold">Average Rating</h3>
+                <div className="flex items-center mt-2">
+                  <span className="text-xl font-semibold">
+                    {averageRating !== null ? averageRating.toFixed(1) : "No ratings yet"}
+                  </span>
+                  <div className="ml-2 flex">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={i < (averageRating ?? 0) ? "text-yellow-500" : "text-gray-300"}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <p className="ml-2 text-gray-600">({reviews.length} reviews)</p>
+                </div>
+              </div>
 
-          {/* Display Average Rating */}
-          <div className="mt-4">
-            <p className={`${montserrat.className} text-lg font-semibold`}>
-              Average Rating: {averageRating !== null ? averageRating.toFixed(1) : "No ratings yet"}
-            </p>
+              {/* Customer Reviews & Write a Review*/}
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Customer Reviews */}
+                <div className="w-full md:w-1/2 p-4 border rounded-md shadow-md bg-white">
+                  <h3 className="text-lg font-bold">Customer Reviews</h3>
+
+                  {reviews.length > 0 ? (
+                    <div className="space-y-4 mt-4">
+                      {reviews.map((review, index) => (
+                        <div
+                          key={`${review.date}-${review.account_id ?? index}`}
+                          className="border p-4 rounded shadow-sm"
+                        >
+                          <div className="flex items-center">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span
+                                key={i}
+                                className={
+                                  i < review.stars ? "text-yellow-500" : "text-gray-300"
+                                }
+                              >
+                                ★
+                              </span>
+                            ))}
+                            <p className="ml-2 text-sm text-gray-600">
+                              {review.stars} / 5
+                            </p>
+                          </div>
+                          <p className="italic mt-1">{review.review}</p>
+                          <p className="text-gray-500 text-sm">
+                            Posted on {new Date(review.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 mt-2">
+                      No reviews yet. Be the first to leave one!
+                    </p>
+                  )}
+                </div>
+
+                {/* Write a Review */}
+                <div className="w-full md:w-1/2">
+                  <AddReviewForm productId={id} />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Add Review Form */}
-          <AddReviewForm productId={id} initialReviews={reviews} />
+          
+          <div className="w-full md:w-1/2">
+            <ProductDetails
+              product={{
+                name: product.productName,
+                price: Number(product.price).toFixed(2),
+                description: product.productDesc,
+              }}
+            />
+          </div>
         </div>
       </div>
     );
