@@ -4,8 +4,7 @@ import { useState } from "react";
 import CategoryFilter from "@/ui/filters/category-filter";
 import PriceFilter from "@/ui/filters/price-filter";
 import SellerFilter from "@/ui/filters/seller-filter";
-import Image from "next/image"
-//import ProductCard from "@/ui/products/product-card";
+import Image from "next/image";
 import Link from "next/link";
 
 // Define ProductWithSeller Type
@@ -23,9 +22,11 @@ export type ProductWithSeller = {
 
 export default function ProductCatalogClient({
   products,
+  sellers,
   searchParams,
 }: {
   products: ProductWithSeller[];
+  sellers: string[];
   searchParams?: {
     category?: string;
     minPrice?: string;
@@ -45,14 +46,14 @@ export default function ProductCatalogClient({
   // 🔍 Ensure price is a number
   const formattedProducts = products.map((product) => ({
     ...product,
-    price: Number(product.price), 
+    price: Number(product.price),
   }));
 
   // Filter products based on selected filters
   const filteredProducts = formattedProducts.filter((product) => {
     const isInCategory = !selectedCategory || product.category === selectedCategory;
     const isInPriceRange = product.price >= priceRange.min && product.price <= priceRange.max;
-    const isFromSeller = !selectedSeller || product.account_id === selectedSeller;
+    const isFromSeller = !selectedSeller || product.businessName === selectedSeller; // ✅ Fix seller filter
     return isInCategory && isInPriceRange && isFromSeller;
   });
 
@@ -82,10 +83,7 @@ export default function ProductCatalogClient({
         />
 
         {/* Seller Filter */}
-        <SellerFilter
-          sellers={[...new Set(products.map((p) => p.businessName || "Unknown Seller"))] as string[]} // ✅ Fix seller filter data type
-          onFilterChange={setSelectedSeller}
-        />
+        <SellerFilter sellers={sellers} /> {/* ✅ Fix seller prop type */}
 
         {/* Price Filter */}
         <div className="mt-6">
