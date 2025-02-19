@@ -1,14 +1,13 @@
 "use client"; // This tells Next.js this is a Client Component
 
-import AddToCartButton from "./add-to-cart-button"; // Import the button
-import { cormorant, montserrat } from "@/ui/fonts"; // Fonts for styling
+import { cormorant, montserrat } from "@/ui/fonts";
 
 export default function ProductDetails({
   product,
 }: {
   product: { name: string; price: number | string; description: string };
 }) {
-  const price = Number(product.price) || 0; // Ensure price is a valid number
+  const price = Number(product.price) || 0; 
 
   return (
     <div className="w-full md:w-1/2">
@@ -24,7 +23,6 @@ export default function ProductDetails({
       <p className={`${montserrat.className} text-base md:text-lg text-gray-600 mb-4`}>
         {product.description}
       </p>
-      
     </div>
   );
 }
