@@ -20,9 +20,10 @@ export async function fetchReviewsByProductId(productId: string): Promise<Review
         const { rows } = await sql<Review>`
             SELECT * FROM reviews WHERE product_id = ${productId} ORDER BY date DESC;
         `;
+        console.log(` Retrieved ${rows.length} reviews from database.`);
         return rows;
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error(" Error fetching reviews:", error);
         return [];
     }
 }
@@ -52,7 +53,7 @@ export async function addReview(
   const { product_id, stars, review, account_id } = validatedFields.data;
 
   try {
-    console.log("Adding Review:", { product_id, stars, review, account_id });
+    console.log("Adding Review to Database:", { product_id, stars, review, account_id });
 
     const result = await sql<Review>`
       INSERT INTO reviews (product_id, account_id, stars, review, date)
