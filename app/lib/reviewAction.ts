@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
 import { z } from 'zod';
 import { sql } from "@vercel/postgres";
-import type { Review } from "@/lib/definitions";
+import { Review } from "@/lib/definitions";
 
-// ✅ Define schema validation using Zod
+// Define schema validation
 const ReviewSchema = z.object({
   product_id: z.string().uuid(),
   stars: z.number().min(1).max(5),
@@ -13,25 +13,27 @@ const ReviewSchema = z.object({
   date: z.string().optional(),
 });
 
-// ✅ Fetch all reviews by product ID
+// Fetch Reviews from Database
 export async function fetchReviewsByProductId(productId: string): Promise<Review[]> {
+    console.log(`Fetching reviews for product: ${productId}`);
     try {
         const { rows } = await sql<Review>`
             SELECT * FROM reviews WHERE product_id = ${productId} ORDER BY date DESC;
         `;
+        console.log(` Retrieved ${rows.length} reviews from database.`);
         return rows;
     } catch (error) {
-        console.error("Error fetching reviews:", error instanceof Error ? error.message : error);
+        console.error(" Error fetching reviews:", error);
         return [];
     }
 }
 
-// ✅ Add a new review with validation
+// Add a Review to the Database
 export async function addReview(
   prevState: Record<string, unknown>,
   formData: FormData
 ): Promise<{ success?: boolean; message?: string; errors?: Record<string, string[]>; review?: Review }> {
-  // Validate input fields
+  
   const validatedFields = ReviewSchema.safeParse({
     product_id: formData.get("product_id"),
     stars: Number(formData.get("stars")),
@@ -41,6 +43,7 @@ export async function addReview(
   });
 
   if (!validatedFields.success) {
+    console.error("Validation Error:", validatedFields.error.flatten().fieldErrors);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Submission failed due to invalid input",
@@ -50,6 +53,8 @@ export async function addReview(
   const { product_id, stars, review, account_id } = validatedFields.data;
 
   try {
+    console.log("Adding Review to Database:", { product_id, stars, review, account_id });
+
     const result = await sql<Review>`
       INSERT INTO reviews (product_id, account_id, stars, review, date)
       VALUES (${product_id}, ${account_id}, ${stars}, ${review}, NOW()) 
@@ -60,13 +65,15 @@ export async function addReview(
       throw new Error("Failed to retrieve inserted review with a valid date.");
     }
 
+    console.log("Review Added Successfully:", result.rows[0]);
+
     return {
       success: true,
       message: "Review added successfully!",
       review: result.rows[0],
     };
   } catch (error) {
-    console.error("Error adding review:", error);
+    console.error(" Database Error Adding Review:", error);
     return { message: "Database error occurred while adding the review." };
   }
 }
